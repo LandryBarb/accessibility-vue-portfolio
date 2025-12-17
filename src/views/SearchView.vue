@@ -1,10 +1,11 @@
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue';
 import { 
-  Search, X, Filter, Monitor, Smartphone, 
-  FileText, Layers, ChevronRight 
+  Search, X, Filter, ChevronRight 
 } from 'lucide-vue-next';
-import { projects } from '../content/projects';
+// Import both data sources
+import { caseStudies } from '../content/caseStudies';
+import { experiments } from '../content/projects';
 
 // --- State ---
 const searchQuery = ref('');
@@ -15,25 +16,47 @@ const searchInput = ref(null);
 const categories = [
   { id: 'All', label: 'All' },
   { id: 'Case Study', label: 'Case Studies' },
+  { id: 'Component', label: 'Components' },
   { id: 'Audit', label: 'Audits' },
   { id: 'System Design', label: 'Systems' },
   { id: 'Docs', label: 'Docs' }
 ];
 
+// --- Data Normalization ---
+// Combine and standardize properties for search
+const allContent = computed(() => {
+  const normExperiments = experiments.map(exp => ({
+    ...exp,
+    // Map experiment-specific fields to the common schema used in the template
+    genre: exp.category, 
+    tagline: exp.desc,
+    imageClass: exp.imageClass || 'poster-slate',
+    match: '100%', // Default match for local components
+    type: 'experiment' // Flag for routing
+  }));
+
+  const normCaseStudies = caseStudies.map(cs => ({
+    ...cs,
+    type: 'casestudy' // Flag for routing
+  }));
+
+  return [...normCaseStudies, ...normExperiments];
+});
+
 // --- Filtering Logic ---
 const filteredProjects = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
   
-  return projects.filter(project => {
+  return allContent.value.filter(item => {
     // 1. Category Filter
-    const matchesCategory = activeCategory.value === 'All' || project.genre === activeCategory.value;
+    const matchesCategory = activeCategory.value === 'All' || item.genre === activeCategory.value;
     
-    // 2. Search Query (Checks Title, Tags, Stack, and Tagline)
+    // 2. Search Query (Checks Title, Tags, Stack, and Tagline/Desc)
     const searchableText = [
-      project.title,
-      project.tagline,
-      project.stack,
-      ...project.tags
+      item.title,
+      item.tagline,
+      item.stack,
+      ...(item.tags || [])
     ].join(' ').toLowerCase();
     
     const matchesSearch = !query || searchableText.includes(query);
@@ -46,11 +69,9 @@ const filteredProjects = computed(() => {
 const clearSearch = () => {
   searchQuery.value = '';
   activeCategory.value = 'All';
-  // Return focus to input for keyboard users
   nextTick(() => searchInput.value?.focus());
 };
 
-// Auto-focus on desktop mount
 onMounted(() => {
   if (window.matchMedia('(min-width: 1024px)').matches) {
     searchInput.value?.focus();
@@ -109,30 +130,33 @@ onMounted(() => {
 
         <transition-group name="grid-anim" tag="div" class="poster-grid">
           <article 
-            v-for="project in filteredProjects" 
-            :key="project.id" 
+            v-for="item in filteredProjects" 
+            :key="item.id" 
             class="search-card"
           >
-            <router-link :to="`/case-studies/${project.id}`" class="card-link">
+            <router-link 
+              :to="item.type === 'experiment' ? `/experiments/${item.id}` : `/case-studies/${item.id}`" 
+              class="card-link"
+            >
               
               <div class="card-layout">
-                <div class="card-image" :class="project.imageClass"></div>
+                <div class="card-image" :class="item.imageClass"></div>
                 
                 <div class="card-content">
                   <div class="card-header">
-                    <span class="card-genre">{{ project.genre }}</span>
-                    <span class="card-match">{{ project.match }} Match</span>
+                    <span class="card-genre">{{ item.genre }}</span>
+                    <span v-if="item.match" class="card-match">{{ item.match }} Match</span>
                   </div>
                   
                   <h3 class="card-title">
-                    <span class="highlight-mark" v-if="searchQuery">{{ project.title }}</span>
-                    <span v-else>{{ project.title }}</span>
+                    <span class="highlight-mark" v-if="searchQuery">{{ item.title }}</span>
+                    <span v-else>{{ item.title }}</span>
                   </h3>
                   
-                  <p class="card-stack">{{ project.stack }}</p>
+                  <p class="card-stack">{{ item.stack }}</p>
                   
                   <div class="card-tags">
-                    <span v-for="tag in project.tags.slice(0,3)" :key="tag" class="tag">
+                    <span v-for="tag in item.tags.slice(0,3)" :key="tag" class="tag">
                       {{ tag }}
                     </span>
                   </div>
@@ -168,7 +192,6 @@ onMounted(() => {
 .page-container {
   min-height: 100vh;
   width: 100%;
-  /* Mobile Nav Clearance */
   padding-bottom: var(--space-2xl);
   @include respond-to('laptop') {
     padding-bottom: calc(var(--mobile-nav-height) + var(--space-xl));
@@ -176,7 +199,7 @@ onMounted(() => {
 }
 
 .search-layout {
-  max-width: 1000px; /* Search is often centered and narrower */
+  max-width: 1000px;
   margin: 0 auto;
   padding-top: var(--space-xl);
   
@@ -209,7 +232,7 @@ onMounted(() => {
   background: var(--bg-surface);
   border: 2px solid transparent;
   color: white;
-  font-size: 1.25rem; /* Large accessible text */
+  font-size: 1.25rem;
   padding: 1.2rem 3rem 1.2rem 3.5rem;
   border-radius: 8px;
   transition: all 0.2s var(--ease-cinematic);
@@ -320,7 +343,6 @@ onMounted(() => {
   text-decoration: none;
   color: inherit;
   
-  /* Focus interactions */
   &:hover, &:focus-visible {
     .card-layout {
       background: var(--bg-surface-hover);
@@ -349,19 +371,21 @@ onMounted(() => {
   border-radius: 4px;
   flex-shrink: 0;
   
-  /* Gradients */
   &.poster-blue { background: linear-gradient(135deg, #1e3a8a, #000); }
   &.poster-purple { background: linear-gradient(135deg, #581c87, #000); }
   &.poster-emerald { background: linear-gradient(135deg, #064e3b, #000); }
   &.poster-orange { background: linear-gradient(135deg, #7c2d12, #000); }
+  &.poster-slate { background: linear-gradient(135deg, #334155, #000); }
+  &.poster-zinc { background: linear-gradient(135deg, #3f3f46, #000); }
+  &.poster-neutral { background: linear-gradient(135deg, #525252, #000); }
+  &.poster-dark { background: linear-gradient(135deg, #18181b, #000); }
   
-  /* Hide image on mobile to save space if needed, usually keep for recognition */
   @include respond-to('mobile') { width: 80px; aspect-ratio: 1; }
 }
 
 .card-content {
   flex: 1;
-  min-width: 0; /* Text truncation fix */
+  min-width: 0;
 }
 
 .card-header {

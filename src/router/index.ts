@@ -4,6 +4,7 @@ import HomeView from "../views/HomeView.vue";
 import CaseStudyView from "../views/CaseStudyView.vue";
 import CaseStudiesView from "../views/CaseStudiesView.vue";
 import PortfolioView from "../views/PortfolioView.vue";
+import ExperimentView from '../views/ExperimentView.vue'
 import AboutView from "../views/AboutView.vue";
 import SettingsView from "../views/SettingsView.vue";
 import SearchView from "../views/SearchView.vue";
@@ -28,6 +29,13 @@ const routes = [
       name: 'portfolio',
       component: PortfolioView,
       meta: { title: 'Full Portfolio' }
+    },
+    {
+      path: '/experiments/:id',
+      name: 'experiment-detail',
+      component: ExperimentView,
+      props: true,
+      meta: { title: 'Component Detail' }
     },
 
   {

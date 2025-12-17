@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { projects } from '../content/projects';
+import { caseStudies } from '../content/caseStudies';
 import { 
   Star, Play, Info, MoreVertical, 
   ArrowRightCircle, PlusCircle, CheckCircle, CheckCircle2, Share2 
@@ -14,44 +14,45 @@ const featuredHero = {
   imageClass: "hero-gradient-indigo" 
 };
 
-const library = ref([
-  { 
-    id: 1, 
-    title: "Global Player Redesign", 
-    tagline: "Fixing the 10ft Experience",
-    compliance: "WCAG AA",
-    role: "Lead Engineer",
-    imageClass: "poster-blue",
-    saved: false
-  },
-  { 
-    id: 2, 
-    title: "TVOS Discovery", 
-    tagline: "Solving Grid Navigation",
-    compliance: "VoiceOver Optimized",
-    role: "Audit Lead",
-    imageClass: "poster-purple",
-    saved: false
-  },
-  { 
-    id: 3, 
-    title: "Live Sports Captions", 
-    tagline: "Real-time Text Engines",
-    compliance: "FCC / CVAA",
-    role: "System Architect",
-    imageClass: "poster-emerald",
-    saved: false
-  },
-  { 
-    id: 4, 
-    title: "Design System 2.0", 
-    tagline: "The A11y Component Library",
-    compliance: "Internal AAA",
-    role: "Maintainer",
-    imageClass: "poster-orange",
-    saved: false
-  }
-]);
+const library = ref(caseStudies);
+// const library = ref([
+//   { 
+//     id: 1, 
+//     title: "Global Player Redesign", 
+//     tagline: "Fixing the 10ft Experience",
+//     compliance: "WCAG AA",
+//     role: "Lead Engineer",
+//     imageClass: "poster-blue",
+//     saved: false
+//   },
+//   { 
+//     id: 2, 
+//     title: "TVOS Discovery", 
+//     tagline: "Solving Grid Navigation",
+//     compliance: "VoiceOver Optimized",
+//     role: "Audit Lead",
+//     imageClass: "poster-purple",
+//     saved: false
+//   },
+//   { 
+//     id: 3, 
+//     title: "Live Sports Captions", 
+//     tagline: "Real-time Text Engines",
+//     compliance: "FCC / CVAA",
+//     role: "System Architect",
+//     imageClass: "poster-emerald",
+//     saved: false
+//   },
+//   { 
+//     id: 4, 
+//     title: "Design System 2.0", 
+//     tagline: "The A11y Component Library",
+//     compliance: "Internal AAA",
+//     role: "Maintainer",
+//     imageClass: "poster-orange",
+//     saved: false
+//   }
+// ]);
 
 // --- Interactive Logic ---
 

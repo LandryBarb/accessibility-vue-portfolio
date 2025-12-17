@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, nextTick, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { projects } from '../content/projects';
+import { caseStudies } from '../content/caseStudies';
 import { 
   ArrowLeft, Calendar, User, Layout, Eye, 
   AlertTriangle, CheckCircle2, Code2, Terminal, 
@@ -15,7 +15,7 @@ const route = useRoute();
 const project = computed(() => {
   const id = parseInt(route.params.id);
   // Fallback to project 1 if not found (or handle 404)
-  return projects.find(p => p.id === id) || projects[0];
+  return caseStudies.find(p => p.id === id) || caseStudies[0];
 });
 
 // Helper to render simple markdown bolding **text**

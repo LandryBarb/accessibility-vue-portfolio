@@ -1,88 +1,27 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { Monitor, Smartphone, FileText, Layers, Filter, Play, AlertCircle } from 'lucide-vue-next';
+import { 
+  Monitor, Smartphone, FileText, Layers, Filter, 
+  Code2, AlertCircle, ChevronRight 
+} from 'lucide-vue-next';
+import { experiments } from '../content/projects'; // ONLY Experiments
 
 // --- State ---
 const activeFilter = ref("All");
 
-// --- Static Data ---
+// --- Config ---
 const categories = [
-  { id: "All", label: "All Projects" },
-  { id: "Remediation", label: "Remediation", icon: Monitor },
-  { id: "Audits", label: "Audits", icon: FileText },
-  { id: "Design Systems", label: "Design Systems", icon: Layers },
-  { id: "Mobile", label: "Mobile / TV", icon: Smartphone },
+  { id: "All", label: "All Experiments" },
+  { id: "Component", label: "Components", icon: Code2 },
+  { id: "Form", label: "Forms", icon: FileText },
+  { id: "Pattern", label: "Patterns", icon: Layers },
+  { id: "Utility", label: "Utilities", icon: Monitor },
 ];
 
-const projects = [
-  {
-    id: 1,
-    title: "Global Streaming Player",
-    category: "Mobile",
-    compliance: "WCAG 2.2 AA",
-    imageClass: "poster-blue",
-    description: "Fixing keyboard traps in a 10ft TV interface used by 5M+ users.",
-    tags: ["React Native", "TVOS", "Focus Mgmt"]
-  },
-  {
-    id: 2,
-    title: "Fintech Dashboard Audit",
-    category: "Audits",
-    compliance: "WCAG 2.1 AA",
-    imageClass: "poster-emerald",
-    description: "Comprehensive review of a high-frequency trading platform with 40+ screens.",
-    tags: ["Keyboard Nav", "Screen Reader", "ARIA"]
-  },
-  {
-    id: 3,
-    title: "Accessible Data Viz System",
-    category: "Design Systems",
-    compliance: "WCAG 2.1 AAA",
-    imageClass: "poster-purple",
-    description: "Creating a pattern library for accessible charts, graphs, and complex tables.",
-    tags: ["D3.js", "SVG", "High Contrast"]
-  },
-  {
-    id: 4,
-    title: "Retail App Voice Control",
-    category: "Mobile",
-    compliance: "iOS Guidelines",
-    imageClass: "poster-orange",
-    description: "Optimizing a shopping application for iOS Voice Control and Switch Access.",
-    tags: ["iOS", "SwiftUI", "Voice Control"]
-  },
-  {
-    id: 5,
-    title: "Government Forms Remediation",
-    category: "Remediation",
-    compliance: "Section 508",
-    imageClass: "poster-cyan",
-    description: "Refactoring complex multi-step forms to meet strict federal compliance standards.",
-    tags: ["Forms", "Error Handling", "Cognitive"]
-  },
-  {
-    id: 6,
-    title: "A11y Engineering Workshop",
-    category: "Design Systems",
-    compliance: "Internal",
-    imageClass: "poster-pink",
-    description: "Curriculum and documentation for upskilling frontend teams on ARIA fundamentals.",
-    tags: ["Documentation", "Education", "Process"]
-  },
-  {
-    id: 7,
-    title: "Healthcare Portal Audit",
-    category: "Audits",
-    compliance: "HIPAA / WCAG",
-    imageClass: "poster-indigo",
-    description: "Identifying barriers in patient intake workflows and medical record viewing.",
-    tags: ["Complex Forms", "Modal Dialogs"]
-  }
-];
-
-const filteredProjects = computed(() => {
-  if (activeFilter.value === "All") return projects;
-  return projects.filter(p => p.category === activeFilter.value);
+// --- Filtering Logic ---
+const filteredItems = computed(() => {
+  if (activeFilter.value === "All") return experiments;
+  return experiments.filter(e => e.category === activeFilter.value);
 });
 </script>
 
@@ -91,24 +30,22 @@ const filteredProjects = computed(() => {
     
     <header class="content-wrapper header">
       <div class="header__eyebrow">
-        <Monitor class="icon" aria-hidden="true" />
-        <span>Library</span>
+        <Code2 class="icon" aria-hidden="true" />
+        <span>Experiments Lab</span>
       </div>
-      <h1 class="header__title">Work History & Case Studies</h1>
+      <h1 class="header__title">Component Library & Prototypes</h1>
       <p class="header__desc">
-        A collection of engineering challenges solved through systemic accessibility practices. 
-        Focusing on high-impact remediation, complex audits, and scalable design systems.
+        A collection of atomic accessible components, isolated patterns, and utility hooks. 
+        These are the building blocks of inclusive interfaces.
       </p>
     </header>
 
-    <nav class="filter-bar" aria-label="Project Filters">
+    <nav class="filter-bar" aria-label="Experiment Filters">
       <div class="content-wrapper filter-container">
-        
         <div class="filter-label" aria-hidden="true">
           <Filter size="14" />
           <span>Filter:</span>
         </div>
-        
         <div class="filter-scroll-area">
           <div class="filter-list" role="group">
             <button 
@@ -119,17 +56,11 @@ const filteredProjects = computed(() => {
               :class="{ 'is-active': activeFilter === cat.id }"
               :aria-pressed="activeFilter === cat.id"
             >
-              <component 
-                v-if="cat.icon" 
-                :is="cat.icon" 
-                class="pill-icon" 
-                aria-hidden="true"
-              />
+              <component v-if="cat.icon" :is="cat.icon" class="pill-icon" aria-hidden="true" />
               {{ cat.label }}
             </button>
           </div>
         </div>
-
       </div>
     </nav>
 
@@ -137,41 +68,42 @@ const filteredProjects = computed(() => {
       <TransitionGroup name="grid-anim" tag="div" class="projects-grid">
         
         <article 
-          v-for="project in filteredProjects" 
-          :key="project.id" 
+          v-for="item in filteredItems" 
+          :key="item.id" 
           class="project-card"
         >
-          <router-link :to="`/case-studies/${project.id}`" class="card-link">
-            <div class="card-thumbnail" :class="project.imageClass">
+          <router-link :to="`/experiments/${item.id}`" class="card-link">
+            
+            <div class="card-thumbnail" :class="item.imageClass">
               <div class="badge-overlay">
-                <span class="compliance-badge">{{ project.compliance }}</span>
+                <span class="compliance-badge">{{ item.compliance }}</span>
               </div>
               <div class="hover-overlay">
-                <Play class="play-icon" fill="currentColor" aria-hidden="true" />
-                <span class="play-text">View Case Study</span>
+                <Code2 class="play-icon" />
+                <span class="play-text">View Code</span>
               </div>
             </div>
 
             <div class="card-content">
-              <h3 class="card-title">{{ project.title }}</h3>
-              <p class="card-desc">{{ project.description }}</p>
+              <h3 class="card-title">{{ item.title }}</h3>
+              <p class="card-desc">{{ item.desc }}</p>
+              
               <ul class="card-tags">
-                <li v-for="tag in project.tags" :key="tag" class="tag">
+                <li v-for="tag in item.tags" :key="tag" class="tag">
                   {{ tag }}
                 </li>
               </ul>
             </div>
+
           </router-link>
         </article>
 
       </TransitionGroup>
 
-      <div v-if="filteredProjects.length === 0" class="empty-state">
+      <div v-if="filteredItems.length === 0" class="empty-state">
         <AlertCircle size="48" class="empty-icon" aria-hidden="true" />
-        <p class="empty-text">No projects found in this category.</p>
-        <button @click="activeFilter = 'All'" class="btn-reset">
-          Clear Filters
-        </button>
+        <p class="empty-text">No experiments found.</p>
+        <button @click="activeFilter = 'All'" class="btn-reset">Clear Filters</button>
       </div>
     </section>
 
