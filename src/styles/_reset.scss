@@ -1,0 +1,90 @@
+/* --- Accessibility Reset --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+* {
+  margin: 0;
+  padding: 0; 
+  /* Standardize focus rings across browsers before we style them */
+  outline-color: var(--brand-primary); 
+}
+html {
+-moz-text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+  scroll-behavior: smooth;
+  height: 100%;
+  @media (prefers-reduced-motion: reduce) {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background-color: var(--bg-body);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+}
+/* --- Touch Targets (Mobile A11y) --- */
+button, a {
+  min-height: 44px; /* Apple Human Interface Guidelines */
+  min-width: 44px;
+}
+/* 3. List Cleanup */
+/* Remove list styles on ul, ol elements with a list role, 
+   which suggests a list of semantic items */
+ul[role='list'], ol[role='list'], 
+/* Also aggressively reset any list that has a class attribute */
+ul[class], ol[class] {
+  list-style: none;
+}
+
+/* 4. Media Defaults */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* 5. Form Elements */
+input, button, textarea, select {
+  font: inherit;
+}
+
+/* 6. Text Wrap */
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+  text-wrap: balance; /* Nicer headings */
+}
+
+/* 7. Root Stacking Context */
+#root, #__next {
+  isolation: isolate;
+}
+
+/* --- High Visibility Focus State (AAA) --- */
+/* Replaces browser default with a crisp double-border */
+:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--brand-primary);
+  border-radius: 4px;
+}
+
+/* --- Reduced Motion Support --- */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

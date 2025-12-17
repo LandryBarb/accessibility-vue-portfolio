@@ -1,0 +1,21 @@
+@use "sass:map";
+
+$breakpoints: (
+  'mobile': 640px,
+  'tablet': 768px,
+  'laptop': 1024px,
+  'desktop': 1280px
+);
+
+@mixin respond-to($breakpoint) {
+  $raw-query: map.get($breakpoints, $breakpoint);
+
+  @if $raw-query {
+    @media (max-width: #{$raw-query}) {
+      @content;
+    }
+  } @else {
+    @error 'No value found for breakpoint `#{$breakpoint}`. '
+         + 'Please make sure it is defined in `$breakpoints` map.';
+  }
+}
