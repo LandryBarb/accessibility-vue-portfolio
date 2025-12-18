@@ -1,22 +1,25 @@
 <script setup>
-  import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { Play, Info, CheckCircle2, AlertTriangle, Monitor, Award } from 'lucide-vue-next';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { 
+  Play, Info, CheckCircle2, AlertTriangle, 
+  Monitor, Award, CodeXml 
+} from 'lucide-vue-next';
 
-// --- Assets (Replace with your real files) ---
-// Ideally, import these from your assets folder or use a CMS
-const FEATURED_IMAGE = '../images/hero/screenshot.png'; 
-const FEATURED_VIDEO = '../videos/streaming-player-accessibility.mp4';
+
+
+// --- Assets ---
+// Placeholders - replace with your actual assets
+const FEATURED_IMAGE = 'https://images.unsplash.com/photo-1593789382576-54f489574d26?q=80&w=2070&auto=format&fit=crop'; 
+const FEATURED_VIDEO = 'https://assets.mixkit.co/videos/preview/mixkit-software-developer-working-on-code-monitor-close-up-1728-large.mp4';
 
 // --- State ---
 const showVideo = ref(false);
 let timer = null;
-const VIDEO_DELAY_MS = 3000; // 3 Seconds like Hulu/Netflix
+const VIDEO_DELAY_MS = 3000;
 
 // --- Lifecycle ---
 onMounted(() => {
-  // A11y: Check for reduced motion preference before enabling auto-play behaviors
   const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-  
   if (!mediaQuery.matches) {
     timer = setTimeout(() => {
       showVideo.value = true;
@@ -28,17 +31,52 @@ onBeforeUnmount(() => {
   if (timer) clearTimeout(timer);
 });
 
-// Static Content
+// --- Static Content ---
 const featured = {
-  title: "Ensuring entertainment is for everyone.",
-  subtitle: "Senior Accessibility Engineer specializing in 10-foot experiences and WCAG compliance for streaming.",
+  title: "Human-Centered Accessibility for Entertainment Platforms",
+  subtitle: "I design and build accessible frontend systems for streaming experiences focused on real users, compliance, and scale.",
 };
 
+// --- Projects / Experiments Data ---
+// We only display the data points relevant to the "Poster" view
 const projects = [
-  { id: 1, title: "Global Player Redesign", genre: "Case Study", meta: ["TVOS", "Focus"], imageClass: "poster-blue", match: "98%" },
-  { id: 2, title: "Discovery Interface", genre: "Audit", meta: ["Grid", "Screen Reader"], imageClass: "poster-purple", match: "95%" },
-  { id: 3, title: "Live Captioning System", genre: "System Design", meta: ["Real-time", "Cognitive"], imageClass: "poster-emerald", match: "99%" },
-  { id: 4, title: "10ft Design System", genre: "Docs", meta: ["Components", "Aria"], imageClass: "poster-orange", match: "92%" }
+  {
+    id: 101, // Unique ID
+    title: "Accessible Button Atom",
+    category: "Component",
+    stack: "Vue 3 / TS",
+    compliance: "AAA",
+    imageClass: "poster-blue",
+    tags: ["UI Kit", "Focus", "States"],
+  },
+  {
+    id: 102, // Unique ID
+    title: "Icon Button Atom",
+    category: "Component",
+    stack: "Vue 3 / TS",
+    compliance: "AAA",
+    imageClass: "poster-purple", // Choose: poster-blue, poster-purple, poster-emerald, poster-orange
+    tags: ["Touch Target", "Focus", "Interactive"],
+  },
+  {
+    id: 103,
+    title: "Search Input",
+    category: "Form",
+    stack: "Vue 3 / Debounce",
+    compliance: "AAA",
+    imageClass: "poster-emerald",
+    tags: ["Input", "Focus Mgmt", "Debounce"],
+  },
+  {
+    id: 104,
+    title: "Reduced Motion",
+    category: "Utility",
+    stack: "CSS/JS",
+    compliance: "Best Practice",
+    imageClass: "poster-orange",
+    tags: ["Animation", "Hook"],
+  }
+
 ];
 </script>
 
@@ -51,9 +89,8 @@ const projects = [
           class="bg-layer bg-image"
           :style="{ backgroundImage: `url(${FEATURED_IMAGE})` }"
         ></div>
-      </div>
-
-      <transition name="crossfade">
+        
+        <transition name="crossfade">
           <div v-if="showVideo" class="bg-layer bg-video-wrapper">
              <video 
                class="bg-video" 
@@ -67,15 +104,16 @@ const projects = [
              </video>
           </div>
         </transition>
-      
+        
         <div class="bg-layer bg-vignette"></div>
+      </div>
 
       <div class="content-wrapper hero__content">
         <div class="meta-row">
-          <span class="meta-badge badge--new">New Premiere</span>
-          <span class="meta-text">2024</span>
+          <span class="meta-badge badge--new">Accessible Technologist</span>
+          <span class="meta-text">2026</span>
           <span class="meta-box">CC</span>
-          <span class="meta-box">AD</span>
+          <span class="meta-box">ADA</span>
           <span class="meta-box">AAA</span>
         </div>
 
@@ -83,7 +121,7 @@ const projects = [
         <p class="hero__desc">{{ featured.subtitle }}</p>
 
         <div class="hero__actions">
-          <router-link to="/case-studies/1" class="btn btn--primary">
+          <router-link to="/experiments/101" class="btn btn--primary">
             <Play class="btn-icon" fill="currentColor" />
             <span>Play Case Study</span>
           </router-link>
@@ -101,7 +139,7 @@ const projects = [
       
       <div class="grid-posters">
         <article v-for="project in projects" :key="project.id" class="poster-card">
-          <router-link :to="`/case-studies/${project.id}`" class="poster-link">
+          <router-link :to="`/experiments/${project.id}`" class="poster-link">
             
             <div class="poster-image" :class="project.imageClass">
               <div class="poster-overlay">
@@ -113,13 +151,15 @@ const projects = [
               <h3 class="poster-title">{{ project.title }}</h3>
               
               <div class="poster-meta">
-                <span class="match-score">{{ project.match }} Match</span>
-                <span class="genre">{{ project.genre }}</span>
-                <span class="hd-badge">HD</span>
+                <span class="match-score">{{ project.compliance }}</span>
+                
+                <span class="genre">{{ project.category }}</span>
+                
+                <span class="hd-badge">{{ project.stack }}</span>
               </div>
               
               <div class="poster-tags">
-                <span v-for="tag in project.meta" :key="tag" class="tag">{{ tag }}</span>
+                <span v-for="tag in project.tags" :key="tag" class="tag">{{ tag }}</span>
               </div>
             </div>
 
@@ -132,7 +172,7 @@ const projects = [
       <div class="specs-grid">
         <div class="spec">
           <Monitor class="spec-icon" aria-hidden="true" />
-          <span><strong>10-foot UI</strong> Specialist</span>
+          <span><strong>Accessibility</strong> Specialist</span>
         </div>
         <div class="spec">
           <CheckCircle2 class="spec-icon" aria-hidden="true" />
@@ -141,6 +181,10 @@ const projects = [
         <div class="spec">
           <AlertTriangle class="spec-icon text-warning" aria-hidden="true" />
           <span><strong>Risk</strong> Mitigation</span>
+        </div>
+          <div class="spec">
+          <CodeXml class="spec-icon text-icon" aria-hidden="true" />
+          <span><strong>Vue / </strong> Nuxt</span>
         </div>
       </div>
     </footer>
@@ -154,41 +198,31 @@ const projects = [
 /* CUBE: Composition Layer */
 .page-container {
   padding-bottom: var(--space-2xl);
-  /* Adjust for mobile nav bottom bar */
   @include respond-to('laptop') {
     padding-bottom: calc(var(--mobile-nav-height) + var(--space-lg));
   }
 }
 
-
 /* BLOCK: Hero */
 .hero {
   position: relative;
-  min-height: 80vh; /* Viewport height */
+  min-height: 80vh;
   display: flex;
   align-items: center;
   overflow: hidden;
-
-  /* Make sure the background stays behind content */
   isolation: isolate;
-
-  /* Responsive height */
   @include respond-to('mobile') { min-height: 60vh; }
 
-  /* Background Management */
   &__bg {
     position: absolute;
     inset: 0;
-    /* Cinematic Gradient */
     background-color: var(--bg-body);
-   // background: radial-gradient(circle at 80% 20%, rgba(30, 64, 175, 0.4) 0%, transparent 60%),
-              // linear-gradient(to top, var(--bg-body) 10%, transparent 100%);
     z-index:-1;
   }
 
   &__content {
     width: 100%;
-   z-index: 10;
+    z-index: 10;
     margin-top: var(--space-xl);
   }
 
@@ -198,11 +232,10 @@ const projects = [
     line-height: 1.1;
     margin-bottom: var(--space-sm);
     max-width: 25ch;
-    
   }
 
   &__desc {
-    font-size: var(--text-h2); /* Responsive font var */
+    font-size: var(--text-h2);
     color: var(--text-secondary);
     max-width: 60ch;
     margin-bottom: var(--space-lg);
@@ -225,12 +258,11 @@ const projects = [
 .bg-image {
   background-size: cover;
   background-position: center top;
-  /* If no image loads, fall back to dark blue/black gradient */
   background-color: #0f172a; 
 }
 
 .bg-video-wrapper {
-  z-index: 1; /* Sits on top of image */
+  z-index: 1;
   overflow: hidden;
 }
 
@@ -240,26 +272,23 @@ const projects = [
   object-fit: cover;
 }
 
-/* The Vignette: Crucial for text readability */
 .bg-vignette {
-  z-index: 2; /* Sits on top of video and image */
+  z-index: 2;
   background: radial-gradient(circle at 75% 25%, rgba(30, 64, 175, 0.2) 0%, transparent 50%),
               linear-gradient(to top, var(--bg-body) 5%, rgba(5, 5, 5, 0.6) 25%, transparent 100%),
               linear-gradient(to right, rgba(5, 5, 5, 0.8) 0%, transparent 60%);
 }
 
-/* Transition: Smooth Crossfade */
 .crossfade-enter-active,
 .crossfade-leave-active {
   transition: opacity 2s ease-in-out;
 }
-
 .crossfade-enter-from,
 .crossfade-leave-to {
   opacity: 0;
 }
+
 /* --- TEXT & UI ELEMENTS --- */
-/* BLOCK: Meta Row (Tags) */
 .meta-row {
   display: flex;
   align-items: center;
@@ -286,14 +315,11 @@ const projects = [
   line-height: 1;
 }
 
-
-
-/* BLOCK: Trending Section (Grid) */
+/* BLOCK: Trending Section */
 .section-trending {
   position: relative;
   z-index: 10;
-  margin-top: -3rem; /* Overlap effect */
-  
+  margin-top: -3rem;
   @include respond-to('mobile') { margin-top: 0; }
 }
 
@@ -305,14 +331,9 @@ const projects = [
 
 .grid-posters {
   display: grid;
-  /* Auto-fit handles responsiveness perfectly without explicit media queries */
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: var(--space-md);
-  
-  @include respond-to('mobile') {
-    /* On very small screens, 1 col */
-    grid-template-columns: 1fr; 
-  }
+  @include respond-to('mobile') { grid-template-columns: 1fr; }
 }
 
 /* BLOCK: Poster Card */
@@ -321,8 +342,6 @@ const projects = [
     display: block;
     text-decoration: none;
     color: inherit;
-
-    /* Focus/Hover Interactions */
     &:hover, &:focus-visible {
       .poster-image {
         transform: scale(1.05);
@@ -344,7 +363,6 @@ const projects = [
   transition: all 0.3s var(--ease-cinematic);
   margin-bottom: var(--space-xs);
 
-  /* Gradients */
   &.poster-blue { background: linear-gradient(135deg, #1e3a8a, #000); }
   &.poster-purple { background: linear-gradient(135deg, #581c87, #000); }
   &.poster-emerald { background: linear-gradient(135deg, #064e3b, #000); }

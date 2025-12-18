@@ -4,8 +4,8 @@ import {
   Search, X, Filter, ChevronRight 
 } from 'lucide-vue-next';
 // Import both data sources
-import { caseStudies } from '../content/caseStudies';
-import { experiments } from '../content/projects';
+import { caseStudies } from '../data/caseStudies';
+import { experiments } from '../data/experiments';
 
 // --- State ---
 const searchQuery = ref('');

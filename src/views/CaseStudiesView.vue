@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { caseStudies } from '../content/caseStudies';
+import { caseStudies } from '../data/caseStudies';
 import { 
   Star, Play, Info, MoreVertical, 
   ArrowRightCircle, PlusCircle, CheckCircle, CheckCircle2, Share2 

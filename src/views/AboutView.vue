@@ -5,23 +5,28 @@ import {
   Download
 } from 'lucide-vue-next';
 
+// --- Assets ---
+// Replace these strings with your actual import paths (e.g., import headshot from '@/assets/me.jpg')
+const headshotUrl = "/images/headshot.jpg"; 
+const videoUrl = "https://assets.mixkit.co/videos/preview/mixkit-programmer-working-in-a-dark-room-41641-large.mp4";
+
 // --- Static Data ---
 const profile = {
   name: "Landry Barb II",
   title: "Senior Accessibility Engineer",
   status: "Available for Hire",
   location: "Los Angeles, CA",
-  bio: "I bridge the gap between design systems and assistive technology. With 8+ years of experience in React and Native development, I specialize in building '10-foot experiences' that are fully navigable by keyboard, voice, and switch controls.",
+  bio: "I’m a frontend engineer focused on accessibility for entertainment platforms where small design decisions can affect millions of users. My background in performance and digital platforms shapes how I think about audience experience, usability, and inclusion as an engineering discipline.",
   email: "connect@landrybarb.com",
   socials: [
-    { label: "LinkedIn", url: "#", icon: Linkedin },
-    { label: "GitHub", url: "#", icon: Github },
+    { label: "LinkedIn", url: "https://www.linkedin.com/in/landrybarb/", icon: Linkedin },
+    { label: "GitHub", url: "https://github.com/LandryBarb", icon: Github },
     { label: "Resume", url: "#", icon: Download }
   ]
 };
 
 const stats = [
-  { label: "Years Exp.", value: "8+", icon: Clock },
+  { label: "Years Exp.", value: "3+", icon: Clock },
   { label: "Audit Hours", value: "2k+", icon: CheckCircle2 },
   { label: "WCAG Level", value: "AAA", icon: Award },
   { label: "Components", value: "150+", icon: Briefcase },
@@ -60,8 +65,24 @@ const experience = [
         
         <div class="profile-visual">
           <div class="avatar-ring">
-            <div class="avatar-placeholder">LB</div>
+            <div class="avatar-media">
+              <video 
+                class="avatar-video" 
+                autoplay 
+                loop 
+                muted 
+                playsinline
+                :src="videoUrl"
+              ></video>
+              
+              <img 
+                :src="headshotUrl" 
+                alt="Landry Barb II Headshot" 
+                class="avatar-img" 
+              />
+            </div>
           </div>
+
           <div class="status-badge">
             <span class="status-dot"></span>
             {{ profile.status }}
@@ -156,7 +177,7 @@ const experience = [
 }
 
 .content-wrapper {
-  max-width: 1000px; /* Narrower for readability */
+  max-width: 1000px;
   margin: 0 auto;
   padding: 0 var(--space-lg);
   @include respond-to('mobile') { padding: 0 var(--space-sm); }
@@ -199,7 +220,7 @@ const experience = [
   width: 180px;
   height: 180px;
   border-radius: 50%;
-  padding: 4px;
+  padding: 4px; /* The Gradient Border Thickness */
   background: linear-gradient(135deg, var(--brand-primary), var(--brand-focus));
   
   @include respond-to('mobile') {
@@ -208,18 +229,45 @@ const experience = [
   }
 }
 
-.avatar-placeholder {
+/* NEW: Media Container for Video/Img */
+.avatar-media {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   background-color: var(--bg-surface);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 4rem;
-  font-weight: 800;
-  color: var(--text-tertiary);
-  border: 4px solid var(--bg-body); /* Creates gap effect */
+  position: relative;
+  overflow: hidden; /* Clips the square video/img to a circle */
+  border: 4px solid var(--bg-body); /* Creates gap effect between media and ring */
+  
+  /* Fix for Safari border-radius overflow clipping */
+  transform: translateZ(0); 
+  mask-image: -webkit-radial-gradient(white, black);
+}
+
+.avatar-img,
+.avatar-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-video {
+  z-index: 1; /* Behind image */
+  opacity: 0.8; /* Slight dim for video if needed */
+}
+
+.avatar-img {
+  z-index: 2; /* On top */
+  transition: opacity 0.4s ease-in-out;
+  background-color: var(--bg-surface); /* Prevents transparent background during load */
+}
+
+/* Reveal Video on Hover */
+.avatar-media:hover .avatar-img {
+  opacity: 0;
 }
 
 .status-badge {
@@ -242,7 +290,7 @@ const experience = [
   height: 8px;
   border-radius: 50%;
   background-color: currentColor;
-  box-shadow: 0 0 8px currentColor; /* Glow */
+  box-shadow: 0 0 8px currentColor;
 }
 
 /* Profile Info */
@@ -395,12 +443,12 @@ flex-direction: column;
   
   &:last-child { 
     padding-bottom: 0; 
-    .timeline-marker .line { display: none; } /* Hide last connecting line */
+    .timeline-marker .line { display: none; }
   }
   
   @include respond-to('mobile') {
     gap: var(--space-sm);
-    grid-template-columns: 24px 1fr; /* Smaller marker area on mobile */
+    grid-template-columns: 24px 1fr;
   }
 }
 
@@ -408,15 +456,15 @@ flex-direction: column;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 6px; /* Align dot with text cap height roughly */
+  padding-top: 6px;
   
   .dot {
     width: 12px;
     height: 12px;
     border-radius: 50%;
     background-color: var(--brand-primary);
-    border: 2px solid var(--bg-body); /* Cutout effect */
-    outline: 2px solid var(--brand-primary); /* Outer ring */
+    border: 2px solid var(--bg-body);
+    outline: 2px solid var(--brand-primary);
     flex-shrink: 0;
     z-index: 2;
   }
@@ -426,7 +474,7 @@ flex-direction: column;
     flex-grow: 1;
     background-color: rgba(255,255,255,0.1);
     margin-top: 4px;
-    margin-bottom: -10px; /* Connect to next item */
+    margin-bottom: -10px;
   }
 }
 

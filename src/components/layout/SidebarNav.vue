@@ -74,9 +74,9 @@ const navItems = [
               </button>
             </div>
             <dl class="stats-grid">
-              <div class="stat"><dt>Experience</dt><dd>3 Years</dd></div>
-              <div class="stat"><dt>Stack</dt><dd>Vue 3, SCSS</dd></div>
-              <div class="stat"><dt>WCAG</dt><dd>Level AAA</dd></div>
+              <div class="stat"><dt>Accessibility</dt><dd>WCAG 2.2, ADA</dd></div>
+              <div class="stat"><dt>Focus</dt><dd>Streaming Platforms</dd></div>
+              <div class="stat"><dt>Build</dt><dd>Human-First</dd></div>
             </dl>
           </div>
         </div>

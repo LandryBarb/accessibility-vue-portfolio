@@ -1,24 +1,21 @@
 <script setup>
 import { ref, computed, nextTick, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import { caseStudies } from '../content/caseStudies';
+import { caseStudies } from '../data/caseStudies';
 import { 
   ArrowLeft, Calendar, User, Layout, Eye, 
   AlertTriangle, CheckCircle2, Code2, Terminal, 
-  ChevronRight, Play, Pause, ExternalLink, Video 
+  Play, Video 
 } from 'lucide-vue-next';
 
 const route = useRoute();
 
-// --- Static Data (The Narrative) ---
-// --- Dynamic Data Loading ---
+// --- Data & Computed ---
 const project = computed(() => {
   const id = parseInt(route.params.id);
-  // Fallback to project 1 if not found (or handle 404)
   return caseStudies.find(p => p.id === id) || caseStudies[0];
 });
 
-// Helper to render simple markdown bolding **text**
 const renderMarkdown = (text) => {
   return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 };
@@ -26,58 +23,44 @@ const renderMarkdown = (text) => {
 const toc = [
   { id: "overview", label: "Overview" },
   { id: "gap", label: "The Gap" },
-  { id: "evidence", label: "Visual Audit" }, // Added to TOC
+  { id: "evidence", label: "Visual Audit" },
   { id: "constraints", label: "Constraints" },
   { id: "solution", label: "The Solution" },
   { id: "impact", label: "Impact" },
 ];
 
-// --- "Immersive Hero" Logic ---
-const showHeroVideo = ref(false);
-let heroTimer = null;
+// --- Intersection Observer (Active TOC Tracking) ---
+const activeSection = ref("overview");
+let observer = null;
 
-// Reset video state when navigating between projects
-watch(() => route.params.id, () => {
-  showHeroVideo.value = false;
-  isAuditPlaying.value = false;
-  if (heroTimer) clearTimeout(heroTimer);
-  initHeroTimer();
-});
+const setupObserver = () => {
+  const options = {
+    root: null,
+    rootMargin: '-20% 0px -60% 0px', // Trigger when section is near top of viewport
+    threshold: 0
+  };
 
-const initHeroTimer = () => {
-  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-  if (!mediaQuery.matches) {
-    heroTimer = setTimeout(() => { showHeroVideo.value = true; }, 2000);
-  }
+  observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        activeSection.value = entry.target.id;
+      }
+    });
+  }, options);
+
+  // Observe all sections defined in TOC
+  toc.forEach(item => {
+    const el = document.getElementById(item.id);
+    if (el) observer.observe(el);
+  });
 };
 
-onMounted(() => {
-  initHeroTimer();
-});
-
-onBeforeUnmount(() => {
-  if (heroTimer) clearTimeout(heroTimer);
-});
-
-// --- "Visual Evidence" Player Logic ---
-const isAuditPlaying = ref(false);
-const auditVideoRef = ref(null);
-
-const playAuditVideo = async () => {
-  isAuditPlaying.value = true;
-  await nextTick();
-  if (auditVideoRef.value) {
-    auditVideoRef.value.focus();
-    // Optional: explicitly call play if autoplay is blocked, 
-    // though the 'autoplay' attribute handles most cases.
-  }
-};
-
-// --- Scroll Spy / Anchor Logic ---
+// --- Scroll Logic ---
 const scrollTo = (id) => {
   const el = document.getElementById(id);
   if (el) {
-    const offset = 100; // Account for sticky headers
+    // Offset for sticky headers/visual comfort
+    const offset = 80; 
     const bodyRect = document.body.getBoundingClientRect().top;
     const elementRect = el.getBoundingClientRect().top;
     const elementPosition = elementRect - bodyRect;
@@ -87,8 +70,55 @@ const scrollTo = (id) => {
       top: offsetPosition,
       behavior: 'smooth'
     });
+    
+    // Manually set active immediately for responsiveness
+    activeSection.value = id;
   }
 };
+
+// --- Video Logic ---
+const showHeroVideo = ref(false);
+const isAuditPlaying = ref(false);
+const auditVideoRef = ref(null);
+let heroTimer = null;
+
+const initHeroTimer = () => {
+  const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (!mediaQuery.matches) {
+    heroTimer = setTimeout(() => { showHeroVideo.value = true; }, 2000);
+  }
+};
+
+const playAuditVideo = async () => {
+  isAuditPlaying.value = true;
+  await nextTick();
+  if (auditVideoRef.value) {
+    auditVideoRef.value.focus();
+  }
+};
+
+// --- Lifecycle ---
+onMounted(() => {
+  initHeroTimer();
+  setupObserver();
+});
+
+onBeforeUnmount(() => {
+  if (heroTimer) clearTimeout(heroTimer);
+  if (observer) observer.disconnect();
+});
+
+watch(() => route.params.id, () => {
+  showHeroVideo.value = false;
+  isAuditPlaying.value = false;
+  if (heroTimer) clearTimeout(heroTimer);
+  // Re-init logic after DOM update
+  nextTick(() => {
+    initHeroTimer();
+    if (observer) observer.disconnect();
+    setupObserver();
+  });
+});
 </script>
 
 <template>
@@ -142,7 +172,12 @@ const scrollTo = (id) => {
           <span class="toc-label">Chapters</span>
           <ul class="toc-list">
             <li v-for="item in toc" :key="item.id">
-              <button @click="scrollTo(item.id)" class="toc-link">
+              <button 
+                @click="scrollTo(item.id)" 
+                class="toc-link"
+                :class="{ 'is-active': activeSection === item.id }"
+                :aria-current="activeSection === item.id ? 'true' : undefined"
+              >
                 {{ item.label }}
               </button>
             </li>
@@ -173,7 +208,6 @@ const scrollTo = (id) => {
             <AlertTriangle class="heading-icon text-warning" aria-hidden="true" />
             The Accessibility Gap
           </h2>
-          
           <div class="grid-barriers">
             <div 
               v-for="(barrier, index) in project.barriers" 
@@ -194,7 +228,6 @@ const scrollTo = (id) => {
             <Video class="heading-icon text-highlight" aria-hidden="true" />
             Visual Evidence
           </h2>
-          
           <figure class="media-container">
             <transition name="fade" mode="out-in">
               <div v-if="!isAuditPlaying" class="media-placeholder" key="image">
@@ -203,7 +236,6 @@ const scrollTo = (id) => {
                   :alt="`Visual audit screenshot for ${project.title}`" 
                   class="media-image" 
                 />
-                
                 <div class="media-overlay">
                   <button 
                     class="play-fab" 
@@ -225,7 +257,6 @@ const scrollTo = (id) => {
                   tabindex="0"
                 >
                   <source :src="project.auditVideo" type="video/mp4">
-                  Your browser does not support HTML video.
                 </video>
               </div>
             </transition>
@@ -251,7 +282,6 @@ const scrollTo = (id) => {
             <Code2 class="heading-icon text-brand" aria-hidden="true" />
             Remediation Strategy
           </h2>
-          
           <div class="code-window">
             <div class="window-header">
               <span class="file-name">{{ project.solution.fileName }}</span>
@@ -261,7 +291,6 @@ const scrollTo = (id) => {
             </div>
             <pre class="code-block"><code>{{ project.solution.code }}</code></pre>
           </div>
-          
           <div class="step-list">
             <div v-for="(step, i) in project.solution.steps" :key="i" class="step">
               <span class="step-num">{{ (i + 1).toString().padStart(2, '0') }}</span>
@@ -289,7 +318,6 @@ const scrollTo = (id) => {
 
       </main>
     </div>
-
   </div>
 </template>
 
@@ -298,9 +326,8 @@ const scrollTo = (id) => {
 
 .page-container {
  width: 100%;
-  overflow-x: hidden; /* Safety net for the whole page */
+ 
 }
-
 
 /* --- HERO --- */
 .hero {
@@ -313,10 +340,9 @@ const scrollTo = (id) => {
   overflow: hidden;
   width: 100%;
 
-  /* Mobile: shorter hero */
   @include respond-to('mobile') { 
     min-height: 50vh; 
-    align-items: center; /* Center content on mobile */
+    align-items: center;
     padding-bottom: 0;
   }
 }
@@ -404,6 +430,7 @@ const scrollTo = (id) => {
   display: grid;
   grid-template-columns: 250px 1fr;
   gap: var(--space-2xl);
+  align-items: start; /* Prevents sidebar from stretching full height */
   
   @include respond-to('laptop') {
     grid-template-columns: 100%;
@@ -411,24 +438,34 @@ const scrollTo = (id) => {
   }
 }
 
-/* --- SIDEBAR TOC --- */
+/* --- SIDEBAR TOC (UPDATED) --- */
 .sidebar-toc {
   position: sticky;
-  top: calc(var(--space-xl) + 20px); /* Clear fixed header if any */
+  position: -webkit-sticky;
+  /* Top offset accounts for any global fixed nav + gap */
+  top: 120px; 
+  align-self: start; /* Crucial for grid item stickiness */
   height: fit-content;
+  max-height: calc(100vh - 100px);
   min-width: 0;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
   
   @include respond-to('laptop') {
-    position: relative;
-    top: 0;
+    position: sticky; /* Keep it sticky on mobile too if desired, or 'relative' */
+    top: 0; /* Stick to top of viewport on mobile */
+    z-index: 50; /* Ensure it floats above content */
+    background: var(--bg-body); /* Prevent see-through on scroll */
     margin-bottom: var(--space-xl);
     border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: var(--space-lg);
+    padding: var(--space-md) 0;
+    margin-top: -1rem; /* Pull up closer to hero */
   }
 }
 
 .toc-nav {
   margin-bottom: var(--space-lg);
+  @include respond-to('laptop') { margin-bottom: 0; }
 }
 
 .toc-label {
@@ -439,18 +476,24 @@ const scrollTo = (id) => {
   color: var(--text-tertiary);
   margin-bottom: var(--space-sm);
   letter-spacing: 0.05em;
+  
+  @include respond-to('laptop') { display: none; } /* Hide label on mobile to save space */
 }
 
 .toc-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: 2px;
+  border-left: 2px solid rgba(255,255,255,0.1);
+  padding-left: 0;
   
   /* Mobile: Horizontal scroll pill list */
   @include respond-to('laptop') {
     flex-direction: row;
+    border-left: none;
     overflow-x: auto;
+    gap: var(--space-xs);
     padding-bottom: 4px;
     scrollbar-width: none; 
     &::-webkit-scrollbar { display: none; }
@@ -458,23 +501,43 @@ const scrollTo = (id) => {
 }
 
 .toc-link {
+  display: block;
+  width: 100%;
   background: none;
   border: none;
   color: var(--text-secondary);
   text-align: left;
   cursor: pointer;
   font-size: 0.9rem;
-  padding: 4px 0;
-  transition: color 0.2s;
+  padding: 8px 16px;
+  border-left: 2px solid transparent; /* Highlight marker */
+  margin-left: -2px; /* Overlap parent border */
+  transition: all 0.2s ease;
   
-  &:hover { color: var(--brand-primary); translate: 4px 0; }
+  &:hover { 
+    color: var(--brand-primary); 
+  }
+
+  /* ACTIVE STATE */
+  &.is-active {
+    color: var(--brand-primary);
+    font-weight: 600;
+    border-left-color: var(--brand-primary);
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), transparent);
+  }
   
   @include respond-to('laptop') {
     white-space: nowrap;
+    border-left: none;
+    margin-left: 0;
     background: rgba(255,255,255,0.05);
     padding: 6px 12px;
     border-radius: 99px;
-    &:hover { translate: 0; background: rgba(255,255,255,0.1); }
+    
+    &.is-active {
+      background: var(--brand-primary);
+      color: white;
+    }
   }
 }
 
@@ -486,6 +549,8 @@ const scrollTo = (id) => {
   padding: var(--space-md);
   border-radius: 8px;
   border: 1px solid rgba(255,255,255,0.1);
+  
+  @include respond-to('laptop') { display: none; } /* Hide extra badge on mobile */
 }
 
 .badge-ring {
@@ -509,14 +574,14 @@ const scrollTo = (id) => {
 
 /* --- MAIN CONTENT --- */
 .article-content {
-  max-width: 80ch; /* Readable line length */
+  max-width: 80ch;
   min-width: 0; 
   width: 100%;
 }
 
 .section-block {
   margin-bottom: var(--space-2xl);
-  scroll-margin-top: 100px; /* For anchor scrolling */
+  scroll-margin-top: 140px; /* Increased offset for comfortable scrolling */
 }
 
 .section-heading {
@@ -526,7 +591,7 @@ const scrollTo = (id) => {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  flex-wrap: wrap; /* Safety for small screens */
+  flex-wrap: wrap;
   
   .heading-icon { opacity: 0.8; }
   .text-warning { color: var(--status-warning); }
@@ -551,7 +616,7 @@ const scrollTo = (id) => {
 }
 
 .card-barrier {
-  background: rgba(239, 68, 68, 0.05); /* Red tint */
+  background: rgba(239, 68, 68, 0.05);
   border: 1px solid rgba(239, 68, 68, 0.2);
   padding: var(--space-md);
   border-radius: 8px;
@@ -598,7 +663,7 @@ const scrollTo = (id) => {
   strong { color: white; }
 }
 
-/* CODE BLOCK (The "Tech Flex") */
+/* CODE BLOCK */
 .code-window {
   background: #0d0d0d;
   border: 1px solid rgba(255,255,255,0.1);
@@ -606,7 +671,6 @@ const scrollTo = (id) => {
   overflow: hidden;
   margin: var(--space-md) 0;
   font-family: var(--font-mono);
-  /* CRITICAL FIXES FOR MOBILE */
   max-width: 100%;
   width: 100%;
   display: flex;
@@ -632,16 +696,9 @@ const scrollTo = (id) => {
   font-size: 0.85rem;
   line-height: 1.6;
   color: #e2e8f0;
-  /* SCROLL HANDLING */
-  overflow-x: auto;
-  white-space: pre; /* Forces scroll instead of wrap */
+  white-space: pre;
   width: 100%;
   display: block;
-  .kwd { color: #c084fc; } /* Purple */
-  .fn { color: #60a5fa; }  /* Blue */
-  .arg { color: #fb923c; } /* Orange */
-  .str { color: #4ade80; } /* Green */
-  .comment { color: #64748b; font-style: italic; }
 }
 
 .step-list {
@@ -700,18 +757,14 @@ const scrollTo = (id) => {
   span { color: var(--text-tertiary); }
 }
 
-/* TRANSITIONS */
-.crossfade-enter-active, .crossfade-leave-active { transition: opacity 2s ease; }
-.crossfade-enter-from, .crossfade-leave-to { opacity: 0; }
-
-/* --- NEW: VISUAL EVIDENCE STYLES --- */
+/* VISUAL EVIDENCE & TRANSITIONS */
 .media-container {
   border-radius: 12px;
   overflow: hidden;
   border: 1px solid rgba(255,255,255,0.1);
   background: var(--bg-surface);
   position: relative;
-  aspect-ratio: 16/9; /* Maintain cinematic aspect ratio */
+  aspect-ratio: 16/9;
   width: 100%;
 }
 
@@ -764,12 +817,6 @@ const scrollTo = (id) => {
     border-color: var(--brand-primary);
     transform: scale(1.1);
   }
-  
-  /* AAA Focus */
-  &:focus-visible {
-    outline: 4px solid rgba(59, 130, 246, 0.5);
-    outline-offset: 4px;
-  }
 }
 
 .overlay-label {
@@ -792,12 +839,12 @@ const scrollTo = (id) => {
   
   &:focus-visible {
     outline: 2px solid var(--brand-primary);
-    outline-offset: -2px; /* Draw focus inside video to prevent scrollbar */
+    outline-offset: -2px;
   }
 }
 
-/* Transition for Media Swap */
+.crossfade-enter-active, .crossfade-leave-active { transition: opacity 2s ease; }
+.crossfade-enter-from, .crossfade-leave-to { opacity: 0; }
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
-
 </style>

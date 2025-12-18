@@ -4,7 +4,7 @@ import {
   Monitor, Smartphone, FileText, Layers, Filter, 
   Code2, AlertCircle, ChevronRight 
 } from 'lucide-vue-next';
-import { experiments } from '../content/projects'; // ONLY Experiments
+import { experiments } from '../data/experiments'; // ONLY Experiments
 
 // --- State ---
 const activeFilter = ref("All");

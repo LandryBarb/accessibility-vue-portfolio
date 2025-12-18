@@ -1,7 +1,7 @@
 <script setup>
 import { computed, defineAsyncComponent } from 'vue';
 import { useRoute } from 'vue-router';
-import { experiments } from '../content/projects';
+import { experiments } from '../data/experiments';
 import { 
   ArrowLeft, Github, ExternalLink, 
   Code2, CheckCircle2, Layers, Cpu 
@@ -11,7 +11,12 @@ import {
 // This lazy loads the components so they don't bloat the initial bundle
 const componentMap = { 
   
-  'BaseButton': defineAsyncComponent(() => import('../components/content/BaseButton.vue')),
+  'BaseButton': defineAsyncComponent(() => import('../components/atoms/BaseButton.vue')),
+  'IconButton' : defineAsyncComponent(() => import('../components/atoms/IconButton.vue')),
+  'SearchInput' : defineAsyncComponent(() => import('../components/molecules/SearchInput.vue')),
+  'AccordionItem' : defineAsyncComponent(() => import('../components/molecules/AccordionItem.vue')),
+  'Accordion' : defineAsyncComponent(()=> import('../components/organisms/Accordion.vue'))
+
 };
 
 const route = useRoute();
