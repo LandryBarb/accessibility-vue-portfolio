@@ -27,7 +27,8 @@ const classes = computed(() => [
 </script>
 
 <template>
-  <button
+  <div class="ds-stagecraft">
+   <button
     :type="type"
     :disabled="disabled || loading"
     :class="classes"
@@ -36,7 +37,9 @@ const classes = computed(() => [
   >
     <span v-if="loading" class="spinner" aria-hidden="true"></span>
     <span><slot>Click Me</slot></span>
-  </button>
+  </button>  
+  </div>
+ 
 </template>
 
 <style lang="scss" scoped>

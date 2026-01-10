@@ -1,0 +1,172 @@
+.ds-stagecraft {
+  /* ------------------------------------------------------------------------
+     STAGE BLACK — Background depth (cool, cinematic)
+     --------------------------------------------------------------------- */
+
+  --color-stage-black-900: #0D0F14; /* app root */
+  --color-stage-black-850: #11141B; /* nav rails */
+  --color-stage-black-800: #151922; /* page surface */
+  --color-stage-black-750: #1B202B; /* cards */
+  --color-stage-black-700: #232836; /* hovered containers */
+
+  /* Canonical background aliases */
+  --color-bg-root: var(--color-stage-black-900);
+  --color-bg-surface: var(--color-stage-black-800);
+  --color-bg-elevated: var(--color-stage-black-750);
+
+  /* ------------------------------------------------------------------------
+     RIG GRAY — UI chrome & controls
+     --------------------------------------------------------------------- */
+
+  --color-rig-gray-800: #14161D;
+  --color-rig-gray-700: #181B23;
+  --color-rig-gray-600: #1B1E27;
+  --color-rig-gray-500: #242838;
+  --color-rig-gray-400: #2F3447;
+
+  /* Canonical border aliases */
+  --color-border-subtle: var(--color-rig-gray-400);
+  --color-border-strong: var(--color-rig-gray-500);
+
+  /* ------------------------------------------------------------------------
+     CABLE STEEL — Secondary surfaces / panels
+     --------------------------------------------------------------------- */
+
+  --color-cable-steel-800: #1F232C;
+  --color-cable-steel-700: #262B36;
+  --color-cable-steel-600: #2C313D;
+  --color-cable-steel-500: #343A48;
+  --color-cable-steel-400: #3E4556;
+
+  /* ------------------------------------------------------------------------
+     GHOST WHITE — Text system (contrast-safe)
+     --------------------------------------------------------------------- */
+
+  --color-ghost-white-50:  #F5F5F5; /* primary text */
+  --color-ghost-white-100: #E8E8E8; /* secondary */
+  --color-ghost-white-200: #D1D1D1; /* metadata */
+  --color-ghost-white-300: #B5B5B5; /* disabled */
+  --color-ghost-white-400: #9A9AA6; /* muted */
+
+  /* Canonical text aliases */
+  --color-text-primary: var(--color-ghost-white-50);
+  --color-text-secondary: var(--color-ghost-white-100);
+  --color-text-muted: var(--color-ghost-white-400);
+
+  /* ------------------------------------------------------------------------
+     SPOTLIGHT BLUE — Primary action & focus family
+     --------------------------------------------------------------------- */
+
+  --color-spotlight-blue-700: #1E6FB8;
+  --color-spotlight-blue-600: #2E8EDB;
+  --color-spotlight-blue-500: #42A5F5;
+  --color-spotlight-blue-400: #6BB9FF;
+  --color-spotlight-blue-300: #9FD3FF;
+
+  /* Canonical action aliases */
+  --color-accent-primary: var(--color-spotlight-blue-500);
+  --color-accent-primary-hover: var(--color-spotlight-blue-600);
+  --color-accent-primary-active: var(--color-spotlight-blue-700);
+
+  /* Focus (distinct from accent) */
+  --color-focus-ring: var(--color-spotlight-blue-400);
+
+  /* ------------------------------------------------------------------------
+     SCENE AMBER — Warnings / emphasis
+     --------------------------------------------------------------------- */
+
+  --color-scene-amber-700: #D98C1F;
+  --color-scene-amber-600: #F0A73A;
+  --color-scene-amber-500: #FFB74D;
+  --color-scene-amber-400: #FFD08A;
+  --color-scene-amber-300: #FFE3B8;
+
+  --color-accent-warning: var(--color-scene-amber-500);
+
+  /* ------------------------------------------------------------------------
+     LASER GREEN — Success / enabled
+     --------------------------------------------------------------------- */
+
+  --color-laser-green-700: #558B2F;
+  --color-laser-green-600: #6FA83A;
+  --color-laser-green-500: #8BC34A;
+  --color-laser-green-400: #AEDB7F;
+  --color-laser-green-300: #CDEBB0;
+
+  --color-accent-success: var(--color-laser-green-500);
+
+  /* ------------------------------------------------------------------------
+     CAUTION RED — Errors / destructive
+     --------------------------------------------------------------------- */
+
+  --color-caution-red-700: #B71C1C;
+  --color-caution-red-600: #D84343;
+  --color-caution-red-500: #EF5350;
+  --color-caution-red-400: #F48A87;
+  --color-caution-red-300: #F9B9B7;
+
+  --color-accent-danger: var(--color-caution-red-500);
+
+  /* ------------------------------------------------------------------------
+     DIM VIOLET — Secondary accent (signature)
+     --------------------------------------------------------------------- */
+
+  --color-dim-violet-700: #4A2C7A;
+  --color-dim-violet-600: #6540A6;
+  --color-dim-violet-500: #7E57C2;
+  --color-dim-violet-400: #9C7EDC;
+  --color-dim-violet-300: #BFA9EA;
+
+  --color-accent-secondary: var(--color-dim-violet-500);
+
+    /* ===== Focus ===== */
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+
+      /* ===== Motion ===== */
+  --motion-fast: 120ms;
+  --motion-base: 180ms;
+  --motion-slow: 240ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ===== Radius ===== */
+  --radius-sm: 0.375rem; /* 6 */
+  --radius-md: 0.625rem; /* 10 */
+  --radius-lg: 0.875rem; /* 14 */
+
+    /* ===== Spacing ===== */
+  --space-1: 0.25rem; /* 4 */
+  --space-2: 0.5rem;  /* 8 */
+  --space-3: 0.75rem; /* 12 */
+  --space-4: 1rem;    /* 16 */
+  --space-5: 1.5rem;  /* 24 */
+  --space-6: 2rem;    /* 32 */
+  --space-7: 3rem;    /* 48 */
+
+    /* ===== Typography ===== */
+  /* Use a neutral sans; Inter-like. (If you load Inter, set it before system-ui.) */
+  --font-family-base: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+    "Apple Color Emoji", "Segoe UI Emoji";
+
+  --font-size-xs: 0.75rem;  /* 12px */
+  --font-size-sm: 0.875rem; /* 14px */
+  --font-size-md: 1rem;     /* 16px */
+  --font-size-lg: 1.25rem;  /* 20px */
+  --font-size-xl: 1.5rem;   /* 24px */
+
+  --line-height-tight: 1.25;
+  --line-height-base: 1.5;
+  --line-height-loose: 1.7;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+    /* ===== Z-index scale ===== */
+  --z-background: 0;
+  --z-content: 10;
+  --z-dropdown: 20;
+  --z-toast: 40;
+  --z-overlay: 50;
+  --z-modal: 60;
+}
