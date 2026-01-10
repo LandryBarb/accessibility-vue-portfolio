@@ -70,8 +70,8 @@ p, h1, h2, h3, h4, h5, h6 {
 /* --- High Visibility Focus State (AAA) --- */
 /* Replaces browser default with a crisp double-border */
 :focus-visible {
-  outline: var(--focus-ring-width) solid var(--color-focus-ring);
-  outline-offset: var(--focus-ring-offset);
+  outline: 2px solid var(--brand-focus);
+  outline-offset: 3px;
   box-shadow: 0 0 0 4px var(--brand-primary);
 }
 

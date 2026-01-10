@@ -2,6 +2,6 @@
 @use 'reset';
 @use '../index.scss';
 @use 'variables';
-@use 'util' as *;
+@use '_utilities' as *;
 @use 'layout' as *;
 @use 'blocks' as *;
