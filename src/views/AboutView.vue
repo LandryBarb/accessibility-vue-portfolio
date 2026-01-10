@@ -8,7 +8,7 @@ import {
 // --- Assets ---
 // Replace these strings with your actual import paths (e.g., import headshot from '@/assets/me.jpg')
 const headshotUrl = "/images/headshot.jpg"; 
-const videoUrl = "https://assets.mixkit.co/videos/preview/mixkit-programmer-working-in-a-dark-room-41641-large.mp4";
+const videoUrl = "/videos/about.mp4";
 
 // --- Static Data ---
 const profile = {

@@ -90,13 +90,13 @@ export const caseStudies: CaseStudy[] = [
 
   media: {
     // 1. Hero Background Image (Fallback)
-    heroImage: "/images/caseStudyOneScreen.png",
+    heroImage: "/images/thumbnails/caseStudy_1_vertical.png",
     // 2. Hero Background Video (Autoplays, Muted, Loop)
     // Using a reliable tech-abstract video for testing
-    heroVideo: "/videos.caseStudyOneVid.mp4",
+    heroVideo: "/videos/caseStudyOneVid.mp4",
 
     // 3. Visual Evidence Screenshot (Initial State)
-    auditScreenshot: "/images/caseStudyOneScreen.png",
+    auditScreenshot: "/images/audits/caseStudy_1_audit.png",
 
     // 4. Visual Evidence Video (Plays on Click)
     // Using a screen-recording style video for testing
@@ -182,8 +182,9 @@ export const caseStudies: CaseStudy[] = [
   stack: "Vue 3 / Vite / TypeScript",
 
   media: {
-    heroImage: "/images/settings-panel.png",
+    heroImage: "/images/thumbnails/caseStudy_2_vertical.png",
     heroVideo: "/videos/settings-panel.mp4",
+    auditScreenshot: "/images/audits/caseStudy_2_audit.png",
     auditVideo: "/videos/settings-audit.mp4"
   },
 
@@ -264,7 +265,7 @@ export const caseStudies: CaseStudy[] = [
   stack: "Vue 3 / Vite / TypeScript",
 
   media: {
-    heroImage: "/images/seat-map.png",
+    heroImage: "/images/thumbnails/caseStudy_3_vertical.png",
     heroVideo: "/videos/seat-map.mp4",
     auditVideo: "/videos/seat-audit.mp4"
   },
@@ -343,7 +344,7 @@ export const caseStudies: CaseStudy[] = [
   stack: "Vue 3 / Vite / TypeScript",
 
   media: {
-    heroImage: "/images/dashboard.png",
+    heroImage: "/images/thumbnails/caseStudy_4_vertical.png",
     heroVideo: "/videos/dashboard.mp4",
     auditVideo: "/videos/dashboard-audit.mp4"
   },
