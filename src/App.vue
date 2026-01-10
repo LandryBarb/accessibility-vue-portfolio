@@ -19,7 +19,7 @@ import SidebarNavigation from './components/layout/SidebarNav.vue';
 </template>
 
 <style lang="scss">
-@use '././styles/main.scss';
+@use '././styles/portfolio/global.scss';
 
 /* Composition Layer */
 .app-shell {

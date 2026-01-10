@@ -86,7 +86,7 @@ const navItems = [
 </template>
 
 <style lang="scss" scoped>
-@use '../../styles/mixins' as *;
+@use '../../styles/index.scss' as *;
 
 /* --- Layout: Desktop (Sidebar) --- */
 .nav-container {
