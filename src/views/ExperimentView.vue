@@ -2,6 +2,7 @@
 import { computed, defineAsyncComponent } from 'vue';
 import { useRoute } from 'vue-router';
 import { experiments } from '../data/experiments';
+import '../styles/stagecraft/tokens.scope.css';
 import { 
   ArrowLeft, Github, ExternalLink, 
   Code2, CheckCircle2, Layers, Cpu 
@@ -53,8 +54,11 @@ const ActiveDemo = computed(() => {
         <div class="stage-window">
           <div class="stage-content">
             
-            <div v-if="ActiveDemo" class="live-demo-wrapper">
-              <component :is="ActiveDemo" />
+            <div v-if="ActiveDemo" class="live-demo-wrapper ">
+              <div class="ds-stagecraft">
+                 <component :is="ActiveDemo" />
+              </div>
+             
             </div>
 
             <div v-else class="placeholder-demo">
