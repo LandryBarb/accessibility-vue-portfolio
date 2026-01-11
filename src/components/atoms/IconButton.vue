@@ -54,7 +54,7 @@ const props = withDefaults(
     type?: 'button' | 'submit' | 'reset'
   }>(),
   {
-    variant: 'tertiary',
+    variant: 'destructive',
     size: 'md',
     disabled: false,
     loading: false,
@@ -95,6 +95,7 @@ const classes = computed(() => {
 
 <template>
   <button
+
     :type="props.type"
     :disabled="isDisabled"
     :aria-disabled="isDisabled || undefined"

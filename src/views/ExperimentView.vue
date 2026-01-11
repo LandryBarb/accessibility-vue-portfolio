@@ -13,6 +13,7 @@ import {
 const componentMap = { 
   
   'BaseButton': defineAsyncComponent(() => import('../components/atoms/BaseButton.vue')),
+  'Icon': defineAsyncComponent(() => import('../components/atoms/Icon.vue')),
   'IconButton' : defineAsyncComponent(() => import('../components/atoms/IconButton.vue')),
   'SearchInput' : defineAsyncComponent(() => import('../components/molecules/SearchInput.vue')),
   'AccordionItem' : defineAsyncComponent(() => import('../components/molecules/AccordionItem.vue')),

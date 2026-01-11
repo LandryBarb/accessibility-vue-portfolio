@@ -115,5 +115,25 @@ export const experiments = [
     
     repoLink: "#",
     demoLink: "#"
-  }
+  },
+  {
+  id: 106,
+  title: "Icon Atom",
+  category: "Component",
+  stack: "Vue 3 / TS",
+  compliance: "WCAG 2.2 AA",
+  desc: "A Stagecraft icon atom that centralizes sizing, tone, and ARIA semantics for glyphs.",
+  imageClass: "poster-purple",
+  tags: ["Iconography", "Atom", "Semantics"],
+  componentKey: 'Icon',
+  codeSnippet: `<script setup lang="ts">
+import { Heart } from 'lucide-vue-next'
+</script>
+
+<template>
+  <Icon :as="Heart" size="md" tone="danger" decorative />
+</template>`,
+  repoLink: "#",
+  demoLink: "#"
+}
 ];
