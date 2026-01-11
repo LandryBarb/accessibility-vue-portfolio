@@ -5,7 +5,7 @@ import { experiments } from '../data/experiments';
 import '../styles/stagecraft/tokens.scope.css';
 import { 
   ArrowLeft, Github, ExternalLink, 
-  Code2, CheckCircle2, Layers, Cpu 
+  Code2, CheckCircle2, Layers, Cpu, Heart
 } from 'lucide-vue-next';
 
 // --- 1. Dynamic Component Imports ---

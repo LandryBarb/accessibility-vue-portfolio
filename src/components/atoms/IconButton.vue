@@ -1,213 +1,291 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { Component } from 'vue';
+import { computed } from 'vue'
+import type { Component } from 'vue'
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
-type Size = 'sm' | 'md' | 'lg';
+/**
+ * Stagecraft Icon Button
+ *
+ * This component renders an icon-only or icon+label button using Stagecraft
+ * design tokens for styling. It exposes a typed props API for variants,
+ * sizes, disabled/loading states, optional pressed state for toggle buttons,
+ * and accessible labelling via `label` (visible) or `srLabel` (screen reader only).
+ *
+ * The accessible name is computed as follows:
+ *  - When `loading` is true, the button’s aria-label is “Loading”.
+ *  - If a visible `label` is provided, the button’s name comes from the visible
+ *    text, so `aria-label` is omitted to let assistive tech derive it.
+ *  - Otherwise, the name falls back to `srLabel` or a generic “Button”.
+ *
+ * A `title` attribute mirrors the computed accessible name when no visible label
+ * exists. Browsers display this as a tooltip on hover and focus, ensuring parity
+ * between mouse and keyboard users.
+ *
+ * The internal classes map to Stagecraft CSS variables. Variants and sizes
+ * correspond to the Stagecraft semantic palette (primary, secondary, tertiary,
+ * destructive) and size scale (sm, md, lg).
+ */
+
+// Stagecraft variant and size definitions
+type Variant = 'primary' | 'secondary' | 'tertiary' | 'destructive'
+type Size = 'sm' | 'md' | 'lg'
 
 const props = withDefaults(
   defineProps<{
-    icon?: Component;
-    variant?: Variant;
-    size?: Size;
-    disabled?: boolean;
-    loading?: boolean;
-    label?: string;   // Visible text label
-    srLabel?: string; // Screen-reader only label
-    pressed?: boolean | undefined; 
+    /** Vue component for the icon (required for icon-only button) */
+    icon?: Component
+    /** Visual variant; aligns with Stagecraft palette */
+    variant?: Variant
+    /** Size of the control; affects min dimensions and font */
+    size?: Size
+    /** Disable the button and prevent interaction */
+    disabled?: boolean
+    /** Show a spinner in place of the icon/label */
+    loading?: boolean
+    /** Visible text label; when provided the icon button becomes icon + label */
+    label?: string
+    /** Screen-reader only label; used when there is no visible label */
+    srLabel?: string
+    /**
+     * Optional pressed state for toggle buttons. When defined,
+     * the button has a corresponding aria-pressed attribute.
+     */
+    pressed?: boolean | undefined
+    /** Native button type */
+    type?: 'button' | 'submit' | 'reset'
   }>(),
   {
-    variant: 'primary',
+    variant: 'tertiary',
     size: 'md',
     disabled: false,
     loading: false,
     label: '',
     srLabel: '',
     pressed: undefined,
+    type: 'button'
   }
-);
+)
 
-const accessibleLabel = computed(() => {
-  if (props.loading) return 'Loading';
-  // Use label prop or default slot content logic (handled by browser accessibility tree usually, but good to be explicit)
-  if (props.label) return undefined; 
-  return props.srLabel || 'Button';
-});
+// Computed boolean representing if the control should be disabled
+const isDisabled = computed(() => props.disabled || props.loading)
 
-const classes = computed(() => [
-  'icon-btn',
-  `icon-btn--${props.variant}`,
-  `icon-btn--${props.size}`,
-  {
-    'icon-btn--disabled': props.disabled || props.loading,
-    'icon-btn--loading': props.loading,
-    'icon-btn--with-label': !!props.label
+// Determine the accessible name and tooltip/title content
+const accessibleName = computed((): string | undefined => {
+  if (props.loading) {
+    return 'Loading'
   }
-]);
+  // When there is a visible label, let the text content provide the accessible name
+  if (props.label) {
+    return undefined
+  }
+  // Otherwise fall back to screen reader label or a generic name
+  return props.srLabel || 'Button'
+})
+
+// Compose a list of CSS classes based on props
+const classes = computed(() => {
+  return [
+    'ui-icon-button',
+    `ui-icon-button--${props.variant}`,
+    `ui-icon-button--${props.size}`,
+    props.loading ? 'ui-icon-button--loading' : '',
+    props.label ? 'ui-icon-button--with-label' : ''
+  ]
+})
 </script>
 
 <template>
   <button
-    :class="classes"
-    :disabled="props.disabled || props.loading"
-    :aria-disabled="props.disabled || props.loading"
-    :aria-busy="props.loading"
-    :aria-label="accessibleLabel"
+    :type="props.type"
+    :disabled="isDisabled"
+    :aria-disabled="isDisabled || undefined"
+    :aria-busy="props.loading || undefined"
+    :aria-label="accessibleName"
     :aria-pressed="props.pressed"
-    type="button"
+    :class="classes"
+    :title="accessibleName"
   >
-    <span v-if="props.loading" class="spinner" aria-hidden="true"></span>
+    <!-- Loading spinner shown when loading -->
+    <span v-if="props.loading" class="ui-icon-button__spinner" aria-hidden="true" />
 
+    <!-- Normal content when not loading -->
     <template v-else>
-      <component 
-        v-if="props.icon" 
-        :is="props.icon" 
-        class="icon-btn__icon"
-        aria-hidden="true" 
+      <!-- Icon component if provided -->
+      <component
+        v-if="props.icon"
+        :is="props.icon"
+        class="ui-icon-button__icon"
+        aria-hidden="true"
       />
-      
-      <span v-if="props.label" class="icon-btn__label">{{ props.label }}</span>
-      
-      <slot v-else />
+
+      <!-- Visible label if supplied -->
+      <span v-if="props.label" class="ui-icon-button__label">{{ props.label }}</span>
+
+      <!-- Slot content fallback -->
+      <slot v-else-if="$slots.default" />
+
+      <!-- Screen-reader only fallback label -->
+      <span v-else class="sr-only">{{ props.srLabel || 'Button' }}</span>
     </template>
   </button>
 </template>
 
-<style scoped>
-/* --- Base Styles --- */
-.icon-btn {
+<style scoped lang="scss">
+/* Import Stagecraft tokens; adjust the path based on your project structure */
+@use "../../styles/stagecraft/tokens.scope.css" as *;
+
+/**
+ * Base styling for the icon button. The component is square by default
+ * (min-width equals min-height) to meet touch target guidelines. CSS variables
+ * (--btn-bg, --btn-fg, etc.) are assigned by variant modifiers.
+ */
+.ui-icon-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  border-radius: 8px; 
-  font-family: var(--font-sans, sans-serif);
-  font-weight: 600;
+  gap: var(--space-2);
+
+  /* Square touch target */
+  min-height: var(--tap-target-min);
+  min-width: var(--tap-target-min);
+
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+
+  border-radius: var(--radius-md);
+  border: 1px solid var(--btn-border, var(--color-border-subtle));
+  background-color: var(--btn-bg, var(--color-bg-surface));
+  color: var(--btn-fg, var(--color-text-primary));
+
   cursor: pointer;
-  border: 1px solid transparent; 
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
   user-select: none;
-  line-height: 1;
   -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background-color var(--motion-base) var(--easing-standard),
+    border-color var(--motion-base) var(--easing-standard),
+    color var(--motion-base) var(--easing-standard),
+    transform var(--motion-fast) var(--easing-standard);
+
+  /* Hover and active states */
+  &:hover:not(:disabled) {
+    background-color: var(--btn-bg-hover, var(--color-bg-elevated));
+    border-color: var(--btn-border-hover, var(--color-border-strong));
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--btn-bg-active, var(--color-bg-root));
+    border-color: var(--btn-border-active, var(--color-border-strong));
+    transform: translateY(var(--space-1));
+  }
+
+  /* Focus: rely on global outline; reinforce with subtle color change */
+  &:focus-visible:not(:disabled) {
+    border-color: var(--color-border-strong);
+    background-color: var(--btn-bg-hover, var(--color-bg-elevated));
+  }
+
+  /* Disabled state */
+  &:disabled {
+    cursor: not-allowed;
+    background-color: var(--color-bg-surface);
+    color: var(--color-text-muted);
+    border-color: var(--color-border-subtle);
+  }
+
+  /* Reduced motion: remove transforms/animations */
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+
+    &:active:not(:disabled) {
+      transform: none;
+    }
+  }
 }
 
-/* --- Focus States (WCAG AAA) --- */
-.icon-btn:focus-visible {
-  outline: 2px solid var(--brand-primary, #3b82f6);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+/* Variant modifiers assign token-derived variables only */
+.ui-icon-button--primary {
+  --btn-bg: var(--color-accent-primary);
+  --btn-fg: var(--color-text-primary);
+  --btn-border: var(--color-accent-primary);
+  --btn-bg-hover: var(--color-accent-primary-hover);
+  --btn-bg-active: var(--color-accent-primary-active);
 }
 
-/* --- Disabled State --- */
-.icon-btn--disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  pointer-events: none; 
-  filter: grayscale(0.8);
+.ui-icon-button--secondary {
+  --btn-bg: var(--color-bg-surface);
+  --btn-fg: var(--color-text-primary);
+  --btn-border: var(--color-border-strong);
 }
 
-/* --- Sizes --- */
-.icon-btn--sm {
-  padding: 0.375rem;
-  font-size: 0.75rem;
-  min-width: 32px;
-  min-height: 32px;
+.ui-icon-button--tertiary {
+  --btn-bg: transparent;
+  --btn-fg: var(--color-text-secondary);
+  --btn-border: transparent;
 }
 
-.icon-btn--md {
-  padding: 0.625rem;
-  font-size: 0.875rem;
-  min-width: 44px; /* WCAG Target Size */
-  min-height: 44px;
+.ui-icon-button--destructive {
+  --btn-bg: var(--color-accent-danger);
+  --btn-fg: var(--color-text-primary);
+  --btn-border: var(--color-accent-danger);
+  --btn-bg-hover: var(--color-caution-red-600);
+  --btn-bg-active: var(--color-caution-red-700);
 }
 
-.icon-btn--lg {
-  padding: 0.875rem;
-  font-size: 1rem;
-  min-width: 56px;
-  min-height: 56px;
+/* Size modifiers adjust font-size; min dimensions remain square */
+.ui-icon-button--sm {
+  font-size: var(--font-size-sm);
 }
 
-/* Padding adjustments when label is present */
-.icon-btn--with-label.icon-btn--sm { padding-left: 0.75rem; padding-right: 0.75rem; }
-.icon-btn--with-label.icon-btn--md { padding-left: 1rem; padding-right: 1rem; }
-.icon-btn--with-label.icon-btn--lg { padding-left: 1.5rem; padding-right: 1.5rem; }
-
-/* --- Variants --- */
-.icon-btn--primary {
-  background: linear-gradient(135deg, var(--brand-primary, #3b82f6), var(--brand-focus, #2563eb));
-  color: #ffffff;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-}
-.icon-btn--primary:hover:not(:disabled) {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
+.ui-icon-button--md {
+  font-size: var(--font-size-md);
 }
 
-.icon-btn--secondary {
-  background-color: rgba(255, 255, 255, 0.05); 
-  color: var(--text-primary, #f8fafc);
-  border-color: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(4px);
-}
-.icon-btn--secondary:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+.ui-icon-button--lg {
+  font-size: var(--font-size-md);
+  /* Optionally enlarge icon on large buttons via font size */
 }
 
-.icon-btn--ghost {
-  background: transparent;
-  color: var(--text-secondary, #94a3b8);
-  border-color: transparent;
+/* Additional padding when a visible label is present */
+.ui-icon-button--with-label.ui-icon-button--sm {
+  padding-inline: var(--space-3);
 }
-.icon-btn--ghost:hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.05);
-  color: var(--brand-primary, #3b82f6);
+.ui-icon-button--with-label.ui-icon-button--md {
+  padding-inline: var(--space-4);
 }
-
-.icon-btn--danger {
-  background-color: rgba(239, 68, 68, 0.1);
-  color: var(--status-error, #ef4444);
-  border-color: rgba(239, 68, 68, 0.2);
-}
-.icon-btn--danger:hover:not(:disabled) {
-  background-color: rgba(239, 68, 68, 0.2);
-  border-color: rgba(239, 68, 68, 0.4);
+.ui-icon-button--with-label.ui-icon-button--lg {
+  padding-inline: var(--space-5);
 }
 
-/* Pressed State */
-.icon-btn[aria-pressed="true"] {
-  background-color: var(--brand-primary, #3b82f6);
-  color: white;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
-}
-
-/* --- Content Styling --- */
-.icon-btn__icon {
-  width: 1.25em; 
+/* Icon styling */
+.ui-icon-button__icon {
+  width: 1.25em;
   height: 1.25em;
   flex-shrink: 0;
 }
 
-.icon-btn__label {
+/* Label styling */
+.ui-icon-button__label {
   line-height: 1.2;
 }
 
-/* --- Spinner --- */
-.spinner {
+/* Spinner for loading state */
+.ui-icon-button__spinner {
   width: 1em;
   height: 1em;
   border-radius: 50%;
   border: 2px solid currentColor;
-  border-right-color: transparent; 
-  animation: spin 0.75s linear infinite;
-  opacity: 0.8;
+  border-top-color: transparent;
+  animation: spin 0.6s linear infinite;
+  margin-right: var(--space-1);
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+/* Loading state: change cursor */
+.ui-icon-button--loading {
+  cursor: not-allowed;
 }
 </style>
