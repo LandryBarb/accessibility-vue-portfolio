@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue';
 import { 
   Monitor, Smartphone, FileText, Layers, Filter, 
-  Code2, AlertCircle, ChevronRight 
+  Code2, AlertCircle, ChevronRight, Heart
 } from 'lucide-vue-next';
 import { experiments } from '../data/experiments'; // ONLY Experiments
 

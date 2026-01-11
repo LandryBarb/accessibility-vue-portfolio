@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Component } from 'vue'
+import { Trash } from 'lucide-vue-next';
 
 type IconSize = 'xs' | 'sm' | 'md' | 'lg'
 type IconTone = 'default' | 'muted' | 'danger' | 'success' | 'info'
 
 const props = withDefaults(
   defineProps<{
-    as: Component | string
+    as?: Component | string
     size?: IconSize
     tone?: IconTone
     decorative?: boolean
@@ -16,8 +17,9 @@ const props = withDefaults(
     class?: string
   }>(),
   {
-    size: 'md',
-    tone: 'default',
+    as: Trash,
+    size: 'lg',
+    tone: 'danger',
     decorative: true
   }
 )
@@ -95,8 +97,8 @@ const classes = computed(() => [
 
 /* Glyph itself is square and scales with font-size */
 .ui-icon__glyph {
-  width: 1em;
-  height: 1em;
+  width: 3em;
+  height: 3em;
   flex-shrink: 0;
 }
 

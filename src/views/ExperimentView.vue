@@ -57,7 +57,7 @@ const ActiveDemo = computed(() => {
             
             <div v-if="ActiveDemo" class="live-demo-wrapper ">
               <div class="ds-stagecraft">
-                 <component :is="ActiveDemo" />
+                 <component :is="ActiveDemo" v-bind="experiment.props" />
               </div>
              
             </div>

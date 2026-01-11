@@ -1,3 +1,5 @@
+import { Heart } from "lucide-vue-next";
+
 export const experiments = [
   
   {
@@ -126,6 +128,12 @@ export const experiments = [
   imageClass: "poster-purple",
   tags: ["Iconography", "Atom", "Semantics"],
   componentKey: 'Icon',
+   props: {
+    as: Heart,
+    size: 'md',
+    tone: 'danger',
+    decorative: true
+  },
   codeSnippet: `<script setup lang="ts">
 import { Heart } from 'lucide-vue-next'
 </script>

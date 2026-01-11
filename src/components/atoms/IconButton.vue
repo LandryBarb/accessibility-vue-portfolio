@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import type { Component } from 'vue'
 
+
 /**
  * Stagecraft Icon Button
  *
