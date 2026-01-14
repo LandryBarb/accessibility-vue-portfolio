@@ -155,7 +155,7 @@ const ActiveDemo = computed(() => {
   margin-bottom: var(--space-xl);
   
   @include respond-to('mobile') {
-    height: 60px;
+    height: 64px; /* Taller touch target standard */
     margin-bottom: var(--space-lg);
   }
 }
@@ -168,11 +168,16 @@ const ActiveDemo = computed(() => {
   font-weight: 700;
   text-decoration: none;
   transition: color 0.2s;
+  
+  /* Touch target padding */
+  padding: 8px 0; 
+  
   &:hover { color: white; }
   
-  /* Hide text on very small screens if needed, or keep for clarity */
   span {
-    @include respond-to('mobile') { font-size: 0.9rem; }
+    @include respond-to('mobile') { 
+      font-size: 0.9rem; 
+    }
   }
 }
 
@@ -183,7 +188,8 @@ const ActiveDemo = computed(() => {
   gap: var(--space-2xl);
   
   @include respond-to('laptop') {
-    grid-template-columns: 1fr; /* Stack vertically */
+    display: flex;
+    flex-direction: column;
     gap: var(--space-xl);
   }
 }
@@ -202,12 +208,12 @@ const ActiveDemo = computed(() => {
   padding: 12px 16px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   border-bottom: 1px solid rgba(255,255,255,0.05);
   
   .traffic-lights {
     display: flex;
     gap: 8px;
-    margin-right: var(--space-md);
     
     .light {
       width: 12px; height: 12px; border-radius: 50%;
@@ -225,16 +231,31 @@ const ActiveDemo = computed(() => {
 }
 
 .stage-content {
+  /* Desktop: Fixed aspect ratio for consistency */
   aspect-ratio: 16/9;
   display: flex;
   align-items: center;
   justify-content: center;
   background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+  position: relative;
   
+  /* Mobile: Allow height to grow based on component size */
   @include respond-to('mobile') {
-    aspect-ratio: 4/3; /* Taller on mobile for better visibility */
-    
+    aspect-ratio: unset; 
+    min-height: 320px;
+    padding: var(--space-md);
   }
+}
+
+.live-demo-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Ensure component doesn't get clipped if it transforms/scales */
+  padding: var(--space-xl);
+  overflow: auto; 
 }
 
 .placeholder-demo {
@@ -250,9 +271,7 @@ const ActiveDemo = computed(() => {
   background: rgba(255,255,255,0.03);
   padding: var(--space-md);
   border-radius: 8px;
-  font-family: var(--font-mono);
   border: 1px solid rgba(255,255,255,0.05);
-  overflow-x: auto;
   
   .section-label {
     font-size: 0.75rem;
@@ -261,11 +280,20 @@ const ActiveDemo = computed(() => {
     margin-bottom: var(--space-sm);
     letter-spacing: 0.05em;
   }
-  
-  code { color: var(--code-purple); font-size: 0.9rem; }
 }
 
-/* --- DETAILS (Right Col) --- */
+.code-scroll {
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  
+  code { 
+    color: var(--code-purple); 
+    font-size: 0.9rem; 
+    white-space: pre;
+  }
+}
+
+/* --- DETAILS (Right Col / Bottom on Mobile) --- */
 .details-panel {
   display: flex;
   flex-direction: column;
@@ -273,7 +301,7 @@ const ActiveDemo = computed(() => {
 }
 
 .exp-title {
-  font-size: var(--text-h2);
+  font-size: clamp(1.5rem, 4vw, 2.25rem); /* Fluid type */
   line-height: 1.1;
   font-weight: 800;
 }
@@ -296,21 +324,25 @@ const ActiveDemo = computed(() => {
 
 .spec-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-md);
   padding-bottom: var(--space-sm);
   border-bottom: 1px solid rgba(255,255,255,0.05);
   
   &:last-child { border-bottom: none; padding-bottom: 0; }
   
-  .spec-icon { color: var(--text-tertiary); flex-shrink: 0; }
+  .spec-icon { 
+    color: var(--text-tertiary); 
+    flex-shrink: 0; 
+    margin-top: 2px;
+  }
   .text-success { color: var(--status-success); }
   
   div {
     display: flex;
     flex-direction: column;
-    .label { font-size: 0.75rem; color: var(--text-tertiary); text-transform: uppercase; }
-    .value { font-weight: 700; color: white; }
+    .label { font-size: 0.75rem; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 2px; }
+    .value { font-weight: 700; color: white; line-height: 1.3; }
   }
 }
 
@@ -318,18 +350,8 @@ const ActiveDemo = computed(() => {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+  margin-top: auto; /* Push to bottom if space permits */
   
   .btn { width: 100%; justify-content: center; }
-}
-
-/* Add this to center your live components nicely */
-.live-demo-wrapper {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-lg);
-  overflow: auto; /* In case component is large */
 }
 </style>

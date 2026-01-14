@@ -2,31 +2,27 @@
 import { computed } from 'vue'
 import type { Component } from 'vue'
 
-// Stagecraft variant and size definitions
-type Variant = 'primary' | 'secondary' | 'tertiary' | 'destructive' | 'ghost'
+// Stagecraft definitions
+type Variant = 'primary' | 'secondary' | 'tertiary' | 'destructive'
 type Size = 'sm' | 'md' | 'lg'
 
 const props = withDefaults(
   defineProps<{
-    /** Vue component for the icon (required) */
+    /** Icon component (e.g. Lucide) */
     icon?: Component
-    /** Visual variant; aligns with Stagecraft palette */
+    /** Visual style variant */
     variant?: Variant
-    /** Size of the control; affects min dimensions and font */
+    /** Size step (md = 44px min) */
     size?: Size
-    /** Disable the button and prevent interaction */
+    /** Disable interaction */
     disabled?: boolean
-    /** Show a spinner in place of the icon */
+    /** Loading state */
     loading?: boolean
-    /** * Accessible name for screen readers. 
-     * MANDATORY for icon-only buttons.
-     */
+    /** Accessible name (Required) */
     label: string
-    /** * Optional pressed state for toggle buttons (e.g. Play/Pause). 
-     * Renders `aria-pressed`.
-     */
+    /** Toggle state (renders aria-pressed) */
     pressed?: boolean | undefined
-    /** Native button type */
+    /** Button type */
     type?: 'button' | 'submit' | 'reset'
   }>(),
   {
@@ -41,12 +37,11 @@ const props = withDefaults(
 
 const isDisabled = computed(() => props.disabled || props.loading)
 
-// Compose a list of CSS classes based on props
 const classes = computed(() => [
-  'ui-icon-btn',
-  `ui-icon-btn--${props.variant}`,
-  `ui-icon-btn--${props.size}`,
-  props.loading ? 'ui-icon-btn--loading' : ''
+  'ui-icon-button',
+  `ui-icon-button--${props.variant}`,
+  `ui-icon-button--${props.size}`,
+  props.loading ? 'ui-icon-button--loading' : ''
 ])
 </script>
 
@@ -59,15 +54,16 @@ const classes = computed(() => [
     :aria-busy="props.loading || undefined"
     :aria-label="props.label"
     :aria-pressed="props.pressed"
-    :title="props.label" 
+    :title="props.label"
   >
-    <span v-if="props.loading" class="ui-icon-btn__spinner" aria-hidden="true" />
+    <span v-if="props.loading" class="ui-icon-button__spinner" aria-hidden="true" />
 
     <component
       v-else-if="props.icon"
       :is="props.icon"
-      class="ui-icon-btn__icon"
+      class="ui-icon-button__icon"
       aria-hidden="true"
+      focusable="false"
     />
     
     <slot v-else />
@@ -77,18 +73,17 @@ const classes = computed(() => [
 <style scoped lang="scss">
 @use "../../styles/stagecraft/tokens.scope.css" as *;
 
-.ui-icon-btn {
+.ui-icon-button {
+  /* Base Layout */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  
-  /* Enforce Square Aspect Ratio for Touch Targets */
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1 / 1; /* Enforce Square */
   padding: 0; 
   
+  /* Typography & Shape */
   border-radius: var(--radius-md);
   border: 1px solid transparent;
-  
   cursor: pointer;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
@@ -100,9 +95,9 @@ const classes = computed(() => [
     color var(--motion-base) var(--easing-standard),
     transform var(--motion-fast) var(--easing-standard);
 
-  /* --- Variants --- */
+  /* --- Variants (Mapped to Tokens) --- */
   
-  /* Primary: High visibility actions */
+  /* Primary */
   &--primary {
     background-color: var(--color-accent-primary);
     color: var(--color-text-primary);
@@ -111,13 +106,12 @@ const classes = computed(() => [
     &:hover:not(:disabled) {
       background-color: var(--color-accent-primary-hover);
     }
-    
     &:active:not(:disabled) {
       background-color: var(--color-accent-primary-active);
     }
   }
 
-  /* Secondary: Default interface actions (Surface) */
+  /* Secondary (Default Surface) */
   &--secondary {
     background-color: var(--color-bg-elevated);
     color: var(--color-text-primary);
@@ -129,8 +123,8 @@ const classes = computed(() => [
     }
   }
 
-  /* Ghost: Transparent until hovered (Media controls) */
-  &--ghost {
+  /* Tertiary (Ghost) */
+  &--tertiary {
     background-color: transparent;
     color: var(--color-text-secondary);
     border-color: transparent;
@@ -138,6 +132,18 @@ const classes = computed(() => [
     &:hover:not(:disabled) {
       background-color: rgba(255, 255, 255, 0.1);
       color: var(--color-text-primary);
+    }
+  }
+
+  /* Destructive */
+  &--destructive {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--color-accent-danger);
+    border-color: transparent;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(239, 68, 68, 0.2);
+      border-color: var(--color-accent-danger);
     }
   }
 
@@ -156,7 +162,7 @@ const classes = computed(() => [
   }
 
   &--md {
-    min-width: 2.75rem; /* 44px - WCAG AA Touch Target */
+    min-width: 2.75rem; /* 44px */
     font-size: var(--font-size-md);
   }
 
@@ -165,11 +171,11 @@ const classes = computed(() => [
     font-size: var(--font-size-lg);
   }
 
-  /* --- State Modifiers --- */
+  /* --- States --- */
   &:focus-visible:not(:disabled) {
-    outline: none;
+    outline: 2px solid var(--color-focus-ring);
     border-color: var(--color-focus-ring);
-    box-shadow: 0 0 0 4px rgba(66, 165, 245, 0.2); /* Matching focus ring token */
+    box-shadow: 0 0 0 4px rgba(66, 165, 245, 0.2);
   }
 
   &:disabled {
@@ -179,13 +185,19 @@ const classes = computed(() => [
   }
 }
 
-.ui-icon-btn__icon {
+.ui-icon-button__icon {
   width: 1.25em;
   height: 1.25em;
   flex-shrink: 0;
+  /* Lucide defaults */
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.ui-icon-btn__spinner {
+.ui-icon-button__spinner {
   width: 1em;
   height: 1em;
   border-radius: 50%;

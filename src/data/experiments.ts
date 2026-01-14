@@ -3,27 +3,55 @@ import { Heart, Play, Search, Settings, Check } from "lucide-vue-next";
 export const experiments = [
   
   {
-    id: 101, // Unique ID
-    title: "Accessible Button Atom",
+    id: 101, 
+    title: "Base Button Atom",
     category: "Component",
     stack: "Vue 3 / TS",
     compliance: "WCAG 2.2 AA",
-    desc: "A foundational button component enforcing contrast ratios, focus states, and loading/disabled aria-attributes automatically.",
+    desc: "The fundamental interaction element. Enforces min-height touch targets (44px), high-contrast text, and visible focus states.",
     imageClass: "poster-blue",
     tags: ["UI Kit", "Focus", "States"],
     
-    // THE IMPORTANT PART:
-    componentKey: 'BaseButton', // Must match the key in Step 3
+    componentKey: 'BaseButton', 
     
-    // Code to display in the snippet window
-    codeSnippet: `<BaseButton 
-  variant="primary" 
-  size="md" 
-  :loading="isLoading"
-  @click="submit"
+    props: {
+      variant: 'primary',
+      size: 'md',
+      disabled: false,
+      loading: false,
+      type: 'button'
+    },
+    
+    // Semantic HTML Output
+    codeSnippet: `<button 
+    type="button" 
+    class="ui-button 
+    ui-button--primary 
+    ui-button--md">
+
+  <span 
+  class="ui-button__content">Submit Request</span>
+</button>
+
+<button 
+  type="button" 
+  class="ui-button 
+  ui-button--primary 
+  ui-button--md 
+  ui-button--loading" 
+  aria-busy="true" 
+  disabled
 >
-  Submit Request
-</BaseButton>`,
+  <span 
+  class="ui-button__spinner" 
+  aria-hidden="true">
+  </span>
+
+  <span 
+  class="ui-button__content">
+  Processing...
+  </span>
+</button>`,
     
     repoLink: "#",
     demoLink: "#"
@@ -32,38 +60,66 @@ export const experiments = [
     id: 102,
     title: "Icon Button Atom",
     category: "Component",
-    stack: "Vue 3 / TS",
-    compliance: "WCAG 2.2 AA",
-    desc: "A strictly square, touch-target compliant action trigger. Supports toggle states (aria-pressed) for media controls.",
+    stack: "HTML / ARIA",
+    compliance: "AAA",
+    desc: "Icon-only controls with strict accessible naming. Supports toggle states (aria-pressed) for media players.",
     imageClass: "poster-purple",
     tags: ["Touch Target", "Focus", "Interactive"],
     
     componentKey: 'IconButton', 
     
-    // Explicit props for the Demo Stage
+    // Live Demo Props (Vue)
     props: {
       icon: Play,
-      variant: 'secondary',
+      variant: 'primary',
       size: 'lg',
-      label: 'Play Video', // Accessibility Requirement
+      label: 'Play Video',
       pressed: false
     },
     
-    codeSnippet: `<template>
-  <div class="controls">
-    <IconButton :icon="Rewind" label="Rewind 10s" variant="ghost" />
-    
-    <IconButton 
-      :icon="isPlaying ? Pause : Play" 
-      :label="isPlaying ? 'Pause' : 'Play'" 
-      variant="primary" 
-      size="lg"
-      @click="togglePlay"
-    />
-    
-    <IconButton :icon="FastForward" label="Fast Forward 10s" variant="ghost" />
-  </div>
-</template>`,
+    // Code Snippet (HTML Output with Portfolio Classes)
+    codeSnippet: `<div class="player-controls" 
+    role="group" 
+    aria-label="Playback controls">
+  
+  <button 
+    type="button" 
+    class="ui-icon-button 
+    ui-icon-button--primary 
+    ui-icon-button--lg" 
+    aria-label="Play"
+  >
+    <svg class="ui-icon-button__icon" 
+    aria-hidden="true" 
+    focusable="false">...</svg>
+  </button>
+
+  <button 
+    type="button" 
+    class="ui-icon-button 
+    ui-icon-button--secondary 
+    ui-icon-button--lg" 
+    aria-label="Next episode"
+  >
+    <svg class="ui-icon-button__icon" 
+    aria-hidden="true" 
+    focusable="false">...</svg>
+  </button>
+
+  <button 
+    type="button" 
+    class="ui-icon-button 
+    ui-icon-button--tertiary 
+    ui-icon-button--lg" 
+    aria-label="Closed Captions" 
+    aria-pressed="true"
+  >
+    <svg class="ui-icon-button__icon" 
+    aria-hidden="true" 
+    focusable="false">...</svg>
+  </button>
+  
+</div>`,
     
     repoLink: "#",
     demoLink: "#"

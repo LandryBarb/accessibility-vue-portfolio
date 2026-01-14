@@ -71,7 +71,7 @@ p, h1, h2, h3, h4, h5, h6 {
 /* Replaces browser default with a crisp double-border */
 :focus-visible {
   outline: 2px solid var(--brand-focus);
-  outline-offset: 3px;
+  outline-offset: 4px;
   box-shadow: 0 0 0 4px var(--brand-primary);
 }
 
