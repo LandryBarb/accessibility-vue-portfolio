@@ -5,7 +5,7 @@ import { experiments } from '../data/experiments';
 import '../styles/stagecraft/tokens.scope.css';
 import { 
   ArrowLeft, Github, ExternalLink, 
-  Code2, CheckCircle2, Layers, Cpu, Heart
+  Code2, CheckCircle2, Layers, Cpu, Heart, User
 } from 'lucide-vue-next';
 
 // --- 1. Dynamic Component Imports ---
@@ -20,6 +20,7 @@ const componentMap = {
   'Accordion' : defineAsyncComponent(()=> import('../components/organisms/Accordion.vue')),
   'Text' : defineAsyncComponent(() => import('../components/atoms/Text.vue')),
   'Badge' : defineAsyncComponent(() => import('../components/atoms/Badge.vue')),
+  'Avatar': defineAsyncComponent(() => import('../components/atoms/Avatar.vue')),
 
 };
 

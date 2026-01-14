@@ -91,6 +91,6 @@ router.afterEach(() => {
 
 // Optional: Global Navigation Guard for Document Title
 router.afterEach((to) => {
-  const title = to.meta.title ? `${to.meta.title} | Streaming UI Portfolio` : 'Streaming UI Portfolio';
+  const title = to.meta.title ? `${to.meta.title} | Landry Barb - Accessibility Engineer` : 'Landry Barb - Accessibility Engineer';
   document.title = title;
 });

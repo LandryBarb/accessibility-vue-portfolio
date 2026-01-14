@@ -239,5 +239,46 @@ export const experiments = [
     
     repoLink: "#",
     demoLink: "#"
+  },
+  {
+    id: 109,
+    title: "Avatar Atom",
+    category: "Component",
+    stack: "Vue 3 / TS",
+    compliance: "AAA",
+    desc: "Circular user thumbnail with robust fallback states. It handles broken images gracefully by reverting to initials or a generic icon.",
+    imageClass: "poster-indigo",
+    tags: ["Profile", "Image", "Fallback"],
+    
+    componentKey: 'Avatar',
+    
+    // Demo Props
+    props: {
+      src: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150",
+      initials: "JD",
+      size: "xl",
+      alt: "John Doe"
+    },
+    
+    codeSnippet: `<template>
+  <div class="flex gap-4 items-center">
+    <Avatar 
+      src="/user.jpg" 
+      alt="Sarah Connor" 
+      size="lg" 
+    />
+    
+    <Avatar 
+      initials="SC" 
+      label="Sarah Connor" 
+      size="lg" 
+    />
+    
+    <Avatar size="lg" label="Guest User" />
+  </div>
+</template>`,
+    
+    repoLink: "#",
+    demoLink: "#"
   }
 ];
