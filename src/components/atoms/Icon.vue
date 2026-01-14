@@ -1,142 +1,113 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Component } from 'vue'
-import { Trash } from 'lucide-vue-next';
 
-type IconSize = 'xs' | 'sm' | 'md' | 'lg'
-type IconTone = 'default' | 'muted' | 'danger' | 'success' | 'info'
+// Stagecraft Tokens
+type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
+type IconTone = 'default' | 'muted' | 'danger' | 'success' | 'warning' | 'info' | 'brand'
 
 const props = withDefaults(
   defineProps<{
-    as?: Component | string
+    /** The SVG component to render (e.g. Lucide icon) */
+    as: Component | string
+    /** Size step from design system */
     size?: IconSize
+    /** Semantic color tone */
     tone?: IconTone
+    /** * If true, the icon is purely visual (aria-hidden). 
+     * If false, it acts as an image and requires a label.
+     */
     decorative?: boolean
+    /** Accessible name (required if decorative is false) */
     label?: string
+    /** Optional tooltip title for mouse users */
     title?: string
-    class?: string
   }>(),
   {
-    as: Trash,
-    size: 'lg',
-    tone: 'danger',
-    decorative: true
+    size: 'md',
+    tone: 'default',
+    decorative: true,
+    label: undefined,
+    title: undefined
   }
 )
 
-/**
- * Accessible behavior:
- * - decorative === true → aria-hidden="true", no role/label
- * - decorative === false → role="img" + aria-label from label prop
- */
-const isDecorative = computed(() => props.decorative)
-const computedRole = computed(() =>
-  isDecorative.value ? undefined : ('img' as const)
-)
-const computedAriaHidden = computed(() =>
-  isDecorative.value ? 'true' : undefined
-)
-const computedAriaLabel = computed(() =>
-  !isDecorative.value ? props.label : undefined
+/* --- Accessibility Logic --- */
+// Enforce: Non-decorative icons MUST have a role and a label
+const isSemantic = computed(() => !props.decorative)
+
+const computedRole = computed(() => (isSemantic.value ? 'img' : undefined))
+const computedAriaHidden = computed(() => (props.decorative ? 'true' : undefined))
+const computedAriaLabel = computed(() => 
+  isSemantic.value ? props.label : undefined
 )
 
+/* --- Styling Logic --- */
 const classes = computed(() => [
   'ui-icon',
   `ui-icon--size-${props.size}`,
-  `ui-icon--tone-${props.tone}`,
-  props.class
+  `ui-icon--tone-${props.tone}`
 ])
 </script>
 
 <template>
-  <!--
-    We intentionally wrap the icon component so we can:
-    - Apply Stagecraft sizing & color tokens
-    - Attach ARIA semantics consistently
-  -->
   <span
     :class="classes"
     :role="computedRole"
     :aria-hidden="computedAriaHidden"
     :aria-label="computedAriaLabel"
   >
-    <!--
-      We still render the underlying icon component.
-      It may be an SVG (lucide-vue-next) or any other icon provider.
-    -->
-    <component :is="as" class="ui-icon__glyph" aria-hidden="true">
-      <!-- Optional SVG title when the icon carries meaning -->
-      <template v-if="title">
-        <title>{{ title }}</title>
-      </template>
-    </component>
+    <component 
+      :is="as" 
+      class="ui-icon__glyph" 
+      aria-hidden="true" 
+      focusable="false" 
+    />
+    
+    <title v-if="title">{{ title }}</title>
   </span>
 </template>
 
 <style scoped lang="scss">
 @use "../../styles/stagecraft/tokens.scope.css" as *;
 
-/**
- * Stagecraft Icon Atom
- *
- * - Uses token-derived values only
- * - Color is controlled via tone modifiers
- * - Size is controlled via font-size to keep 1em-based SVGs in sync
- */
 .ui-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  /* Default color follows currentColor but can be overridden via tone */
-  color: var(--icon-color, currentColor);
-
-  /* Ensure click/tap area can grow with surrounding controls */
   line-height: 1;
-}
-
-/* Glyph itself is square and scales with font-size */
-.ui-icon__glyph {
-  width: 3em;
-  height: 3em;
   flex-shrink: 0;
+  
+  /* Color defaults to currentColor but can be overridden by tone */
+  color: var(--icon-color, currentColor);
+  
+  /* Transition for hover effects if parent changes color */
+  transition: color var(--motion-fast) var(--easing-standard);
 }
 
-/* Size modifiers map to Stagecraft typography tokens */
-.ui-icon--size-xs {
-  font-size: var(--font-size-xs);
+.ui-icon__glyph {
+  width: 1em;
+  height: 1em;
+  fill: none; /* Lucide/Outline style */
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.ui-icon--size-sm {
-  font-size: var(--font-size-sm);
-}
+/* --- Sizes (Map to Typography Scale) --- */
+.ui-icon--size-xs { font-size: var(--font-size-xs); } /* 12px */
+.ui-icon--size-sm { font-size: var(--font-size-sm); } /* 14px */
+.ui-icon--size-md { font-size: var(--font-size-md); } /* 16px */
+.ui-icon--size-lg { font-size: var(--font-size-lg); } /* 20px */
+.ui-icon--size-xl { font-size: var(--font-size-xl); } /* 24px */
 
-.ui-icon--size-md {
-  font-size: var(--font-size-md);
-}
-
-.ui-icon--size-lg {
-  font-size: var(--font-size-lg);
-}
-
-/* Tone modifiers – all token-derived */
-.ui-icon--tone-default {
-  --icon-color: var(--color-text-primary);
-}
-
-.ui-icon--tone-muted {
-  --icon-color: var(--color-text-secondary);
-}
-
-.ui-icon--tone-danger {
-  --icon-color: var(--color-accent-danger);
-}
-
-.ui-icon--tone-success {
-  --icon-color: var(--color-status-success);
-}
-
-.ui-icon--tone-info {
-  --icon-color: var(--color-accent-primary);
-}
+/* --- Tones (Map to Color Palette) --- */
+.ui-icon--tone-default { --icon-color: var(--color-text-primary); }
+.ui-icon--tone-muted   { --icon-color: var(--color-text-muted); }
+.ui-icon--tone-brand   { --icon-color: var(--color-accent-primary); }
+.ui-icon--tone-success { --icon-color: var(--color-status-success); }
+.ui-icon--tone-warning { --icon-color: var(--color-status-warning); }
+.ui-icon--tone-danger  { --icon-color: var(--color-status-error); }
+.ui-icon--tone-info    { --icon-color: var(--color-status-info); }
 </style>

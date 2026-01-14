@@ -17,7 +17,9 @@ const componentMap = {
   'IconButton' : defineAsyncComponent(() => import('../components/atoms/IconButton.vue')),
   'SearchInput' : defineAsyncComponent(() => import('../components/molecules/SearchInput.vue')),
   'AccordionItem' : defineAsyncComponent(() => import('../components/molecules/AccordionItem.vue')),
-  'Accordion' : defineAsyncComponent(()=> import('../components/organisms/Accordion.vue'))
+  'Accordion' : defineAsyncComponent(()=> import('../components/organisms/Accordion.vue')),
+  'Text' : defineAsyncComponent(() => import('../components/atoms/Text.vue')),
+  'Badge' : defineAsyncComponent(() => import('../components/atoms/Badge.vue')),
 
 };
 

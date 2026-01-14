@@ -1,4 +1,4 @@
-import { Heart } from "lucide-vue-next";
+import { Heart, Play, Search, Settings, Check } from "lucide-vue-next";
 
 export const experiments = [
   
@@ -29,24 +29,41 @@ export const experiments = [
     demoLink: "#"
   },
   {
-    id: 102, 
+    id: 102,
     title: "Icon Button Atom",
     category: "Component",
     stack: "Vue 3 / TS",
     compliance: "WCAG 2.2 AA",
-    desc: "A circular action trigger with WCAG 2.5.5 touch targets (44px+) and high-contrast focus rings for dark mode.",
+    desc: "A strictly square, touch-target compliant action trigger. Supports toggle states (aria-pressed) for media controls.",
     imageClass: "poster-purple",
     tags: ["Touch Target", "Focus", "Interactive"],
     
     componentKey: 'IconButton', 
     
-    codeSnippet: `<IconButton 
-  :icon="Heart" 
-  variant="secondary" 
-  label="Like"
-  :pressed="isLiked"
-  @click="toggleLike"
-/>`,
+    // Explicit props for the Demo Stage
+    props: {
+      icon: Play,
+      variant: 'secondary',
+      size: 'lg',
+      label: 'Play Video', // Accessibility Requirement
+      pressed: false
+    },
+    
+    codeSnippet: `<template>
+  <div class="controls">
+    <IconButton :icon="Rewind" label="Rewind 10s" variant="ghost" />
+    
+    <IconButton 
+      :icon="isPlaying ? Pause : Play" 
+      :label="isPlaying ? 'Pause' : 'Play'" 
+      variant="primary" 
+      size="lg"
+      @click="togglePlay"
+    />
+    
+    <IconButton :icon="FastForward" label="Fast Forward 10s" variant="ghost" />
+  </div>
+</template>`,
     
     repoLink: "#",
     demoLink: "#"
@@ -118,30 +135,109 @@ export const experiments = [
     repoLink: "#",
     demoLink: "#"
   },
-  {
-  id: 106,
-  title: "Icon Atom",
-  category: "Component",
-  stack: "Vue 3 / TS",
-  compliance: "WCAG 2.2 AA",
-  desc: "A Stagecraft icon atom that centralizes sizing, tone, and ARIA semantics for glyphs.",
-  imageClass: "poster-purple",
-  tags: ["Iconography", "Atom", "Semantics"],
-  componentKey: 'Icon',
-   props: {
-    as: Heart,
-    size: 'md',
-    tone: 'danger',
-    decorative: true
-  },
-  codeSnippet: `<script setup lang="ts">
-import { Heart } from 'lucide-vue-next'
-</script>
+ {
+    id: 106,
+    title: "Icon Atom",
+    category: "Component",
+    stack: "Vue 3 / TS / SVG",
+    compliance: "AAA",
+    desc: "A standardized SVG wrapper that enforces semantic roles for meaningful icons while silencing decorative ones to reduce screen reader noise.",
+    imageClass: "poster-purple",
+    tags: ["Iconography", "Atom", "Semantics"],
+    
+    componentKey: 'Icon',
+    
+    // Explicitly demonstrate semantic usage
+    props: {
+      as: Heart,
+      size: 'xl',
+      tone: 'brand',
+      decorative: false,
+      label: 'Add to Favorites'
+    },
+    
+    codeSnippet: `<template>
+  <Icon :as="Search" tone="muted" />
 
-<template>
-  <Icon :as="Heart" size="md" tone="danger" decorative />
+  <Icon 
+    :as="Heart" 
+    size="xl" 
+    tone="brand" 
+    :decorative="false" 
+    label="Add to Favorites" 
+  />
 </template>`,
-  repoLink: "#",
-  demoLink: "#"
-}
+    
+    repoLink: "#",
+    demoLink: "#"
+  },
+  {
+    id: 107,
+    title: "Typography (Text Atom)",
+    category: "Component",
+    stack: "Vue 3 / Polymorphic",
+    compliance: "AAA",
+    desc: "A polymorphic text primitive that unifies font stacks, weights, and accessible color tokens into semantic presets.",
+    imageClass: "poster-slate",
+    tags: ["Typography", "Design System", "Tokens"],
+    
+    componentKey: 'Text',
+    
+    // Demo Props
+    props: {
+      as: 'h2',
+      variant: 'heading',
+      tone: 'brand',
+      truncate: false
+    },
+    
+    // Code Snippet Display
+    codeSnippet: `<template>
+  <Text as="h1" variant="heading">Page Title</Text>
+  
+  <Text as="span" variant="meta" tone="muted">Published Today</Text>
+  
+  <Text as="p" variant="caption" tone="danger">Invalid input</Text>
+</template>`,
+    
+    repoLink: "#",
+    demoLink: "#"
+  },
+  {
+    id: 108,
+    title: "Badge Atom",
+    category: "Component",
+    stack: "Vue 3 / TS",
+    compliance: "AAA",
+    desc: "Compact status indicators using Stagecraft semantic tones. Supports solid, subtle, and outline variants with optional icons.",
+    imageClass: "poster-cyan", // Matches 'status' vibe
+    tags: ["Status", "Metadata", "Atom"],
+    
+    componentKey: 'Badge',
+    
+    // Demo Props
+    props: {
+      label: "System Operational",
+      tone: "success",
+      variant: "subtle",
+      icon: Check
+    },
+    
+    codeSnippet: `<template>
+  <div class="flex gap-2">
+    <Badge label="New" tone="brand" variant="solid" />
+    <Badge label="Verified" tone="success" variant="outline" />
+    
+    <Badge 
+      label="Security Risk" 
+      tone="danger" 
+      variant="subtle" 
+      :icon="ShieldAlert" 
+    />
+  </div>
+</template>`,
+    
+    repoLink: "#",
+    demoLink: "#"
+  }
 ];
