@@ -4,9 +4,9 @@ export const experiments = [
   
   {
     id: 101, 
-    title: "Base Button Atom",
+    title: "Button",
     category: "Component",
-    stack: "Vue 3 / TS",
+    stack: "HTML / ARIA",
     compliance: "WCAG 2.2 AA",
     desc: "The fundamental interaction element. Enforces min-height touch targets (44px), high-contrast text, and visible focus states.",
     imageClass: "poster-blue",

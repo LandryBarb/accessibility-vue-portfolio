@@ -1,3 +1,36 @@
+export interface CriteriaMap {
+  wcag22?: string[]; // e.g. ["2.1.1", "2.4.7"]
+  section508?: string[]; // e.g. "1194.21(a)"
+}
+
+export interface FixPattern {
+  id: string;
+  summary: string;
+  appliedTo: string[]; // Components or regions applied to
+  criteriaMap?: CriteriaMap;
+}
+
+export interface VerificationEvidence {
+  summary: string;
+  reproSteps: string[];
+  expectedResult: string;
+  actualResult: string;
+  toolsUsed?: string[];
+  criteriaMap?: CriteriaMap;
+}
+
+export interface DefectLogItem {
+  id: string;
+  issue: string;
+  severity: "Critical" | "High" | "Medium" | "Low";
+  status: "Open" | "Fixed" | "Won't Fix" | "Deferred";
+  repro?: string;
+  criteriaMap?: CriteriaMap;
+}
+
+
+
+
 export interface CaseStudyMedia {
   heroImage?: string;
   heroVideo?: string;
@@ -9,11 +42,13 @@ export interface AccessibilityBarrier {
   wcag: string;
   description: string;
   severity: "Critical" | "High" | "Medium" | "Low";
+  criteriaMap?: CriteriaMap;
 }
 export interface RemediationSection {
   fileName: string;
   codeSnippet: string;
   steps: string[];
+  patterns?: FixPattern[];
 }
 
 export interface VerificationSection {
@@ -26,6 +61,7 @@ export interface VerificationSection {
     e2e?: string[];
   };
   summary: string;
+  evidence?: VerificationEvidence[];
 }
 
 export interface ImpactSection {
@@ -44,6 +80,7 @@ export interface AppendixSection {
   knownLimitations?: string[];
   followUps?: string[];
   regressionNotes?: string;
+  defectLog?: DefectLogItem[];
 }
 
 export interface CaseStudy {
@@ -407,5 +444,147 @@ export const caseStudies: CaseStudy[] = [
     author: "Internal Accessibility Audit",
     context: "Compliance Review"
   }
+  },
+  {
+  id: 5,
+  title: "Global Top Navigation",
+  subtitle: "Landmarks, Skip Links & Focus Management",
+  tagline: "The First Step in Accessible Routing",
+  genre: "Case Study",
+  tags: ["Landmarks", "Skip Link", "Focus", "Menu Pattern"],
+  imageClass: "poster-slate",
+  match: "99%",
+  compliance: "WCAG 2.2 AA",
+  saved: false,
+  role: "Lead Engineer",
+  timeline: "Sprint 24",
+  stack: "Vue 3 / SCSS",
+  
+  media: {
+    heroImage: "/images/thumbnails/caseStudy_4_vertical.png", // Reusing for demo
+    auditScreenshot: "/images/audits/caseStudy_4_audit.png"
+  },
+
+  overview: "The top navigation bar is the primary entry point for all users. Initially, it lacked semantic landmarks, had no mechanism to bypass repetitive links, and relied on color-only cues for active states. This remediation established the site-wide keyboard safety net.",
+
+  barriers: [
+    {
+      title: "No Bypass Mechanism",
+      wcag: "2.4.1",
+      description: "Keyboard users were forced to tab through 15+ navigation links on every page load before reaching main content.",
+      severity: "High",
+      criteriaMap: { wcag22: ["2.4.1"] }
+    },
+    {
+      title: "Ambiguous Landmark Roles",
+      wcag: "1.3.1",
+      description: "The navigation container used generic `<div>` tags, preventing screen reader users from navigating by region.",
+      severity: "Medium",
+      criteriaMap: { wcag22: ["1.3.1"] }
+    },
+    {
+      title: "Color-Only Active State",
+      wcag: "1.4.1",
+      description: "Active links were indicated only by a color change (blue vs gray), failing users with low vision or color blindness.",
+      severity: "Medium",
+      criteriaMap: { wcag22: ["1.4.1"] }
+    }
+  ],
+
+  constraints: [
+    "Must support legacy IE11 skip-link behavior (hash change).",
+    "Cannot change visual brand colors."
+  ],
+
+  remediation: {
+    fileName: "AppHeader.vue",
+    // Short representative snippet only
+    codeSnippet: `<header class="site-header" role="banner">
+  <a href="#main-content" class="skip-link">
+    Skip to Main Content
+  </a>
+  
+  <nav aria-label="Global">
+    <ul>
+      <li>
+        <a href="/" :aria-current="isHome ? 'page' : undefined">
+          Home
+        </a>
+      </li>
+    </ul>
+  </nav>
+</header>`,
+    steps: [
+      "Inserted a hidden-until-focused Skip Link as the first DOM element.",
+      "Wrapped navigation in `<nav>` with a unique `aria-label`.",
+      "Applied `aria-current='page'` to the active link to supplement color cues."
+    ],
+    // NEW: Structured Patterns
+    patterns: [
+      {
+        id: "PAT-01",
+        summary: "Skip Link Implementation",
+        appliedTo: ["AppShell.vue", "Global Layout"],
+        criteriaMap: { wcag22: ["2.4.1"] }
+      },
+      {
+        id: "PAT-02",
+        summary: "Programmatic State (aria-current)",
+        appliedTo: ["SidebarNav.vue", "TopNav.vue"],
+        criteriaMap: { wcag22: ["4.1.2", "1.4.1"] }
+      }
+    ]
+  },
+
+  verification: {
+    manualTesting: {
+      keyboard: true,
+      screenReaders: ["NVDA", "TalkBack"]
+    },
+    summary: "Verified that the skip link appears on first tab, and NVDA correctly identifies the 'Global Navigation' landmark.",
+    // NEW: Structured Evidence
+    evidence: [
+      {
+        summary: "Skip Link Functionality",
+        reproSteps: ["Refresh page", "Press Tab once", "Press Enter"],
+        expectedResult: "Focus moves immediately to <main id='main-content'>",
+        actualResult: "Focus moved to main content; browser scrolled to target.",
+        criteriaMap: { wcag22: ["2.4.1"] }
+      },
+      {
+        summary: "Active State Announcement",
+        reproSteps: ["Navigate to 'Settings'", "Use SR to read current link"],
+        expectedResult: "VoiceOver reads 'Settings, current page, link'",
+        actualResult: "Confirmed 'current page' suffix added via aria-current.",
+        criteriaMap: { wcag22: ["4.1.2"] }
+      }
+    ]
+  },
+
+  impact: {
+    quote: "The skip link alone reduced keyboard navigation time by 40% for power users.",
+    author: "UX Research",
+    context: "Sprint Retro"
+  },
+
+  appendix: {
+    accessibilityContract: {
+      keyboardSupport: ["Tab to Skip Link", "Enter to activate", "Focus ring visible"],
+      ariaUsage: ["role='banner'", "aria-label='Global'", "aria-current='page'"],
+      focusBehavior: "Focus moves to main content on skip",
+      screenReaderExpectations: ["Landmark navigation works (D key in NVDA)"]
+    },
+    // NEW: Defect Log
+    defectLog: [
+      {
+        id: "BUG-104",
+        issue: "Skip link hidden behind sticky header on scroll",
+        severity: "Medium",
+        status: "Fixed",
+        repro: "Scroll down 200px, tab backwards to top.",
+        criteriaMap: { wcag22: ["2.4.7"] }
+      }
+    ]
   }
+}
 ];

@@ -29,7 +29,6 @@ const toc = [
   { id: "remediation", label: "Remediation" },
   { id: "verification", label: "Verification" },
   { id: "impact", label: "Impact" },
-  // Appendix is usually secondary, optional in TOC or at bottom
 ];
 
 // --- Intersection Observer (Active TOC Tracking) ---
@@ -62,8 +61,6 @@ const setupObserver = () => {
 const scrollTo = (id) => {
   const el = document.getElementById(id);
   if (el) {
-    // Offset for sticky headers/visual comfort
-    // Responsive offset: Mobile header is smaller, Desktop is larger
     const isMobile = window.innerWidth < 1024;
     const offset = isMobile ? 120 : 80;
     
@@ -77,7 +74,6 @@ const scrollTo = (id) => {
       behavior: 'smooth'
     });
     
-    // Manually set active immediately for responsiveness
     activeSection.value = id;
   }
 };
@@ -118,7 +114,6 @@ watch(() => route.params.id, () => {
   showHeroVideo.value = false;
   isAuditPlaying.value = false;
   if (heroTimer) clearTimeout(heroTimer);
-  // Re-init logic after DOM update
   nextTick(() => {
     initHeroTimer();
     if (observer) observer.disconnect();
@@ -274,6 +269,23 @@ watch(() => route.params.id, () => {
               <p v-html="renderMarkdown(step)"></p>
             </div>
           </div>
+
+          <div v-if="project.remediation.patterns?.length" class="patterns-grid">
+            <h3 class="subsection-title">Applied Patterns</h3>
+            <div v-for="pattern in project.remediation.patterns" :key="pattern.id" class="pattern-card">
+              <div class="pattern-header">
+                <span class="pattern-id">{{ pattern.id }}</span>
+                <span class="pattern-summary">{{ pattern.summary }}</span>
+              </div>
+              <div class="pattern-meta">
+                <span class="meta-label">Applied to:</span>
+                <span class="meta-value">{{ pattern.appliedTo.join(', ') }}</span>
+              </div>
+              <div v-if="pattern.criteriaMap?.wcag22" class="pattern-tags">
+                <span v-for="sc in pattern.criteriaMap.wcag22" :key="sc" class="wcag-tag">{{ sc }}</span>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section id="verification" class="section-block">
@@ -281,6 +293,7 @@ watch(() => route.params.id, () => {
             <ShieldCheck class="heading-icon text-success" aria-hidden="true" />
             Verification
           </h2>
+          
           <div class="verification-grid">
             <div class="verify-card manual">
               <h3 class="verify-title">Manual Testing</h3>
@@ -297,6 +310,7 @@ watch(() => route.params.id, () => {
                 </div>
               </div>
             </div>
+            
             <div v-if="project.verification.automation" class="verify-card auto">
               <h3 class="verify-title">Automation</h3>
               <ul class="test-list">
@@ -304,6 +318,26 @@ watch(() => route.params.id, () => {
               </ul>
             </div>
           </div>
+
+          <div v-if="project.verification.evidence?.length" class="evidence-list">
+            <h3 class="subsection-title">Evidence of Compliance</h3>
+            <div v-for="(ev, idx) in project.verification.evidence" :key="idx" class="evidence-item">
+              <h4 class="evidence-summary">{{ ev.summary }}</h4>
+              <div class="evidence-details">
+                <div class="detail-row">
+                  <strong>Steps:</strong>
+                  <ul><li v-for="step in ev.reproSteps" :key="step">{{ step }}</li></ul>
+                </div>
+                <div class="detail-row">
+                  <strong>Expected:</strong> <span class="text-success">{{ ev.expectedResult }}</span>
+                </div>
+                <div class="detail-row">
+                  <strong>Actual:</strong> <span>{{ ev.actualResult }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <p class="text-body summary-text">{{ project.verification.summary }}</p>
         </section>
 
@@ -332,6 +366,30 @@ watch(() => route.params.id, () => {
               <ul v-if="project.appendix.knownLimitations">
                 <li v-for="lim in project.appendix.knownLimitations" :key="lim">{{ lim }}</li>
               </ul>
+              
+              <div v-if="project.appendix.defectLog?.length" class="defect-log">
+                <h4>Defect Log / Audits</h4>
+                <div class="table-responsive">
+                  <table class="defect-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Severity</th>
+                        <th>Issue</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="defect in project.appendix.defectLog" :key="defect.id">
+                        <td>{{ defect.id }}</td>
+                        <td><span :class="`severity-${defect.severity.toLowerCase()}`">{{ defect.severity }}</span></td>
+                        <td>{{ defect.issue }}</td>
+                        <td><span class="status-pill">{{ defect.status }}</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </details>
         </section>
@@ -344,10 +402,20 @@ watch(() => route.params.id, () => {
 <style lang="scss" scoped>
 @use '../styles/mixins' as *;
 
+/* --- BASE TYPOGRAPHY & UTILS --- */
+.subsection-title {
+  font-size: 1rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  margin: var(--space-lg) 0 var(--space-md);
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: var(--space-xs);
+}
+
 /* --- HERO SECTION --- */
 .hero {
   position: relative;
-  /* Fluid height using clamp/min-height */
   min-height: 55vh;
   display: flex;
   align-items: flex-end;
@@ -355,14 +423,12 @@ watch(() => route.params.id, () => {
   margin-bottom: var(--space-2xl);
   width: 100%;
   overflow: hidden;
-  /* FIX: Creates a new stacking context so children don't get lost behind the body */
   isolation: isolate;
 
-  /* Mobile Adjustment */
   @include respond-to('laptop') {
     min-height: 45vh;
     padding-bottom: var(--space-lg);
-    align-items: center; /* Center content vertically on smaller screens */
+    align-items: center; 
   }
 }
 
@@ -379,7 +445,6 @@ watch(() => route.params.id, () => {
   width: 100%;
   height: 100%;
   z-index: var(--z-normal);
-
 }
 
 .bg-image {
@@ -389,17 +454,13 @@ watch(() => route.params.id, () => {
   opacity: 0.4;
 }
 
-/* Specific wrapper for video to ensure it layers correctly if needed */
-.bg-video-wrapper {
-  z-index: var(--z-normal); 
-}
-
+.bg-video-wrapper { z-index: var(--z-normal); }
 .bg-video { width: 100%; height: 100%; object-fit: cover; }
 
 .bg-vignette { 
-  z-index: 2; background: 
-  linear-gradient(to top, var(--bg-body) 15%, rgba(0,0,0,0.8) 100%);
- }
+  z-index: 2; 
+  background: linear-gradient(to top, var(--bg-body) 15%, rgba(0,0,0,0.8) 100%);
+}
 
 .hero__content {
   width: 100%;
@@ -422,9 +483,7 @@ watch(() => route.params.id, () => {
   &:hover { color: var(--brand-primary); }
 }
 
-.hero__header-group {
-  margin-bottom: var(--space-lg);
-}
+.hero__header-group { margin-bottom: var(--space-lg); }
 
 .compliance-pill {
   display: inline-block;
@@ -462,9 +521,7 @@ watch(() => route.params.id, () => {
   border-top: 1px solid rgba(255,255,255,0.1);
   padding-top: var(--space-md);
   
-  @include respond-to('mobile') {
-    gap: var(--space-md);
-  }
+  @include respond-to('mobile') { gap: var(--space-md); }
 
   .meta-item {
     display: flex;
@@ -479,12 +536,10 @@ watch(() => route.params.id, () => {
 /* --- LAYOUT GRID --- */
 .layout-grid {
   display: grid;
-  /* Desktop: Fixed Sidebar + Fluid Content */
   grid-template-columns: var(--sidebar-width) 1fr;
   gap: var(--space-2xl);
   align-items: start;
   
-  /* Laptop/Tablet/Mobile: Stacked */
   @include respond-to('laptop') {
     grid-template-columns: 100%;
     gap: var(--space-lg);
@@ -494,30 +549,26 @@ watch(() => route.params.id, () => {
 /* --- SIDEBAR NAV --- */
 .sidebar-toc {
   position: sticky;
-  top: var(--space-2xl); /* Adjust based on navbar height */
+  top: var(--space-2xl);
   height: fit-content;
   
   @include respond-to('laptop') {
     position: sticky;
-    top: 0; /* Stick to top on mobile */
+    top: 0;
     z-index: var(--z-sticky);
-    width: 100vw; /* Force viewport width */
-    margin-left: calc(-50vw + 50%); /* Center trick to break out of parent padding */
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
     margin-right: calc(-50vw + 50%);
-
     background: var(--bg-glass);
     backdrop-filter: blur(10px);
-    margin: 0 calc(var(--space-sm) * -1); /* Full bleed */
+    margin: 0 calc(var(--space-sm) * -1);
     padding: var(--space-sm);
     border-bottom: 1px solid rgba(255,255,255,0.1);
     margin-bottom: var(--space-xl);
   }
 }
-.toc-nav {
-  /* Ensure the nav itself doesn't overflow */
-  width: 100%;
-  overflow: hidden;
-}
+
+.toc-nav { width: 100%; overflow: hidden; }
 
 .toc-list {
   list-style: none;
@@ -530,12 +581,10 @@ watch(() => route.params.id, () => {
     flex-direction: row;
     border-left: none;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch; /* Smooth scroll iOS */
+    -webkit-overflow-scrolling: touch;
     padding: 0 var(--space-md) 4px var(--space-md);
     padding-bottom: 8px;
     gap: var(--space-sm);
-    /* Hide scrollbars */
-    -ms-overflow-style: none;
     scrollbar-width: none;
     &::-webkit-scrollbar { display: none; }
   }
@@ -569,7 +618,6 @@ watch(() => route.params.id, () => {
     background: rgba(255,255,255,0.05);
     padding: 6px 12px;
     border-radius: 99px;
-    
     &.is-active {
       background: var(--brand-primary);
       color: white;
@@ -579,18 +627,15 @@ watch(() => route.params.id, () => {
 
 /* --- MAIN CONTENT --- */
 .article-content {
-  max-width: 80ch; /* Reading width */
+  max-width: 80ch;
   width: 100%;
-  min-width: 0; /* CSS Grid overflow fix */
-  @include respond-to('laptop') {
-    /* Add padding back since we stripped it from parent */
-    padding: 0 var(--space-sm); 
-  }
+  min-width: 0;
+  @include respond-to('laptop') { padding: 0 var(--space-sm); }
 }
 
 .section-block {
   margin-bottom: var(--space-2xl);
-  scroll-margin-top: 140px; /* Offset for anchor scrolling */
+  scroll-margin-top: 140px;
 }
 
 .section-heading {
@@ -601,9 +646,7 @@ watch(() => route.params.id, () => {
   align-items: center;
   gap: var(--space-sm);
   color: var(--text-primary);
-  
   .heading-icon { opacity: 0.8; }
-  /* Utility classes from variables */
   .text-warning { color: var(--status-warning); }
   .text-accent { color: var(--code-purple); }
   .text-brand { color: var(--brand-primary); }
@@ -626,7 +669,7 @@ watch(() => route.params.id, () => {
 }
 
 .card-barrier {
-  background: rgba(239, 68, 68, 0.05); /* Error tint */
+  background: rgba(239, 68, 68, 0.05);
   border: 1px solid rgba(239, 68, 68, 0.2);
   padding: var(--space-md);
   border-radius: 8px;
@@ -641,35 +684,12 @@ watch(() => route.params.id, () => {
   flex-wrap: wrap;
 }
 
-.barrier-title {
-  color: #fca5a5; /* Light red */
-  font-weight: 700;
-  font-size: var(--text-body);
-}
+.barrier-title { color: #fca5a5; font-weight: 700; font-size: var(--text-body); }
+.wcag-badge { font-family: var(--font-mono); font-size: var(--text-xs); color: rgba(252, 165, 165, 0.8); border: 1px solid rgba(252, 165, 165, 0.3); padding: 1px 4px; border-radius: 2px; }
+.barrier-desc { font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--space-sm); }
+.tag--error { font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; color: #fca5a5; }
 
-.wcag-badge {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: rgba(252, 165, 165, 0.8);
-  border: 1px solid rgba(252, 165, 165, 0.3);
-  padding: 1px 4px;
-  border-radius: 2px;
-}
-
-.barrier-desc {
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-  margin-bottom: var(--space-sm);
-}
-
-.tag--error { 
-  font-size: var(--text-xs); 
-  font-weight: 700; 
-  text-transform: uppercase; 
-  color: #fca5a5; 
-}
-
-/* --- EVIDENCE --- */
+/* --- EVIDENCE MEDIA --- */
 .media-container {
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 8px;
@@ -687,7 +707,6 @@ watch(() => route.params.id, () => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  
   &:hover .media-image { opacity: 0.6; }
 }
 
@@ -718,20 +737,10 @@ watch(() => route.params.id, () => {
   align-items: center;
   justify-content: center;
   transition: transform var(--duration-fast);
-  
-  &:hover { 
-    transform: scale(1.1); 
-    background: var(--brand-primary); 
-    border-color: var(--brand-primary); 
-  }
+  &:hover { transform: scale(1.1); background: var(--brand-primary); border-color: var(--brand-primary); }
 }
 
-.overlay-label {
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: var(--text-xs);
-  text-shadow: 0 2px 4px black;
-}
+.overlay-label { font-weight: 700; text-transform: uppercase; font-size: var(--text-xs); text-shadow: 0 2px 4px black; }
 
 /* --- CONSTRAINTS --- */
 .list-constraints {
@@ -739,7 +748,6 @@ watch(() => route.params.id, () => {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
-  
   li {
     position: relative;
     padding-left: var(--space-lg);
@@ -755,7 +763,7 @@ watch(() => route.params.id, () => {
 
 /* --- REMEDIATION --- */
 .code-window {
-  background: #0f172a; /* Slate 900 */
+  background: #0f172a;
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: 6px;
   overflow: hidden;
@@ -780,25 +788,57 @@ watch(() => route.params.id, () => {
   font-size: 0.85rem;
   line-height: 1.5;
   color: #e2e8f0;
-  white-space: pre; /* Important for scroll */
+  white-space: pre;
 }
 
 .step-list {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
-  
   .step { display: flex; gap: var(--space-md); }
-  .step-num { 
-    font-family: var(--font-mono); 
-    color: var(--brand-primary); 
-    font-weight: 700; 
-    opacity: 0.6; 
-    min-width: 2ch;
-  }
+  .step-num { font-family: var(--font-mono); color: var(--brand-primary); font-weight: 700; opacity: 0.6; min-width: 2ch; }
 }
 
-/* --- VERIFICATION --- */
+/* --- NEW: REMEDIATION PATTERNS --- */
+.patterns-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.pattern-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: var(--space-md);
+  border-radius: 6px;
+}
+
+.pattern-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--space-sm);
+  .pattern-id { font-family: var(--font-mono); font-size: 0.75rem; color: var(--brand-primary); }
+  .pattern-summary { font-weight: 600; color: var(--text-primary); }
+}
+
+.pattern-meta {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+  .meta-label { color: var(--text-tertiary); font-size: 0.75rem; text-transform: uppercase; margin-right: 4px; }
+}
+
+.wcag-tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  margin-right: 4px;
+}
+
+/* --- VERIFICATION GRID --- */
 .verification-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -813,53 +853,36 @@ watch(() => route.params.id, () => {
   border: 1px solid rgba(255,255,255,0.05);
   padding: var(--space-md);
   border-radius: 6px;
-  
   &.manual { border-top: 2px solid var(--status-success); }
   &.auto { border-top: 2px solid var(--status-info); }
 }
 
-.verify-title {
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-md);
-}
-
-.verify-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  font-size: 0.9rem;
-  margin-bottom: var(--space-sm);
-  
-  &.stack { flex-direction: column; align-items: flex-start; }
-}
-
+.verify-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: var(--space-md); }
+.verify-row { display: flex; align-items: center; gap: var(--space-sm); font-size: 0.9rem; margin-bottom: var(--space-sm); &.stack { flex-direction: column; align-items: flex-start; } }
 .verify-label { color: var(--text-tertiary); }
 .verify-status.passed { color: var(--status-success); display: flex; align-items: center; gap: 4px; font-weight: 600; }
+.sr-tag { display: inline-block; background: rgba(255,255,255,0.1); font-size: var(--text-xs); padding: 2px 6px; border-radius: 4px; margin-right: 4px; margin-bottom: 4px; }
+.test-list { list-style: disc; padding-left: 1.2rem; color: var(--text-secondary); font-size: var(--text-sm); }
+.summary-text { font-style: italic; border-left: 2px solid var(--text-tertiary); padding-left: var(--space-md); }
 
-.sr-tag {
-  display: inline-block;
-  background: rgba(255,255,255,0.1);
-  font-size: var(--text-xs);
-  padding: 2px 6px;
-  border-radius: 4px;
-  margin-right: 4px;
-  margin-bottom: 4px;
+/* --- NEW: EVIDENCE LIST --- */
+.evidence-list {
+  margin-top: var(--space-lg);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  padding-top: var(--space-md);
 }
 
-.test-list {
-  list-style: disc;
-  padding-left: 1.2rem;
-  color: var(--text-secondary);
-  font-size: var(--text-sm);
-}
-
-.summary-text {
-  font-style: italic;
-  border-left: 2px solid var(--text-tertiary);
-  padding-left: var(--space-md);
+.evidence-item {
+  margin-bottom: var(--space-lg);
+  .evidence-summary { color: var(--text-primary); margin-bottom: var(--space-xs); font-size: 1rem; }
+  .evidence-details { 
+    background: rgba(0,0,0,0.2); 
+    padding: var(--space-md); 
+    border-radius: 6px; 
+    font-size: 0.9rem;
+  }
+  .detail-row { margin-bottom: var(--space-sm); }
+  ul { padding-left: 1.2rem; margin-top: 4px; color: var(--text-secondary); }
 }
 
 /* --- IMPACT --- */
@@ -868,57 +891,56 @@ watch(() => route.params.id, () => {
   border: 1px solid rgba(59, 130, 246, 0.2);
   padding: var(--space-xl);
   border-radius: 8px;
-  
   @include respond-to('mobile') { padding: var(--space-lg); }
 }
 
-.impact-quote {
-  font-size: var(--text-h2);
-  color: var(--text-primary);
-  font-style: italic;
-  margin-bottom: var(--space-lg);
-}
-
-.author-meta {
-  display: flex;
-  flex-direction: column;
-  font-size: 0.9rem;
-  strong { color: var(--text-primary); }
-  span { color: var(--text-tertiary); }
-}
+.impact-quote { font-size: var(--text-h2); color: var(--text-primary); font-style: italic; margin-bottom: var(--space-lg); }
+.author-meta { display: flex; flex-direction: column; font-size: 0.9rem; strong { color: var(--text-primary); } span { color: var(--text-tertiary); } }
 
 /* --- APPENDIX --- */
-.appendix-section {
-  border-top: 1px solid rgba(255,255,255,0.1);
-  padding-top: var(--space-lg);
-}
-
-.appendix-details {
-  background: rgba(0,0,0,0.2);
-  border-radius: 6px;
-}
-
-.appendix-summary {
-  padding: var(--space-md);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  font-weight: 600;
-  color: var(--text-secondary);
-  
-  &:hover { color: var(--text-primary); }
-  .chevron { margin-left: auto; transition: transform var(--duration-fast); }
-}
-
+.appendix-section { border-top: 1px solid rgba(255,255,255,0.1); padding-top: var(--space-lg); }
+.appendix-details { background: rgba(0,0,0,0.2); border-radius: 6px; }
+.appendix-summary { padding: var(--space-md); cursor: pointer; display: flex; align-items: center; gap: var(--space-sm); font-weight: 600; color: var(--text-secondary); &:hover { color: var(--text-primary); } .chevron { margin-left: auto; transition: transform var(--duration-fast); } }
 .appendix-details[open] .chevron { transform: rotate(180deg); }
+.appendix-content { padding: 0 var(--space-md) var(--space-md); color: var(--text-secondary); font-size: 0.9rem; ul { padding-left: 1.2rem; } }
 
-.appendix-content {
-  padding: 0 var(--space-md) var(--space-md);
-  color: var(--text-secondary);
-  font-size: 0.9rem;
+/* --- NEW: DEFECT LOG TABLE --- */
+.defect-log { margin-top: var(--space-lg); }
+.defect-log h4 { margin-bottom: var(--space-sm); color: var(--text-secondary); }
+
+/* Responsive Table Container */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-top: var(--space-md);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.defect-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px; /* Ensure structure on small screens */
   
-  ul { padding-left: 1.2rem; }
+  th, td { 
+    text-align: left; 
+    padding: 12px; 
+    border-bottom: 1px solid rgba(255,255,255,0.05); 
+    vertical-align: top;
+  }
+  th { color: var(--text-tertiary); font-weight: 600; background: rgba(255,255,255,0.02); }
+  td { color: var(--text-secondary); }
+  
+  .severity-critical { color: var(--status-error); font-weight: 700; }
+  .severity-high { color: #fca5a5; }
+  .status-pill { 
+    background: rgba(255,255,255,0.1); 
+    padding: 2px 6px; 
+    border-radius: 4px; 
+    font-size: 0.75rem; 
+  }
 }
 
 /* TRANSITIONS */
