@@ -44,7 +44,7 @@ const projects = [
     title: "Accessible Button Atom",
     category: "Component",
     stack: "Vue 3 / TS",
-    compliance: "AAA",
+    compliance: "AA",
     imageClass: "poster-blue",
     tags: ["UI Kit", "Focus", "States"],
   },
@@ -120,9 +120,9 @@ const projects = [
         <p class="hero__desc">{{ featured.subtitle }}</p>
 
         <div class="hero__actions">
-          <router-link to="/experiments/101" class="btn btn--primary">
+          <router-link to="/case-studies/101" class="btn btn--primary">
             <Play class="btn-icon" fill="currentColor" />
-            <span>Play Case Study</span>
+            <span>Featured Case Study</span>
           </router-link>
           
           <router-link to="/about" class="btn btn--secondary">
