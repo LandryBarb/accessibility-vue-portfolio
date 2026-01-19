@@ -110,7 +110,7 @@ const ActiveDemo = computed(() => {
           </div>
         </div>
 
-        <div class="action-buttons">
+        <!-- <div class="action-buttons">
           <a :href="experiment.repoLink" target="_blank" class="btn btn--primary">
             <Github size="18" />
             <span>View Repo</span>
@@ -119,7 +119,7 @@ const ActiveDemo = computed(() => {
             <ExternalLink size="18" />
             <span>Live Demo</span>
           </a>
-        </div>
+        </div> -->
       </aside>
 
     </main>

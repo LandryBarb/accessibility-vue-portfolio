@@ -2,7 +2,7 @@
 import { 
   Briefcase, Mail, Linkedin, Github, 
   Award, Clock, CheckCircle2, MapPin, 
-  Download
+  Download, Globe, Eye, Code, Layers
 } from 'lucide-vue-next';
 
 // --- Assets ---
@@ -13,7 +13,7 @@ const videoUrl = "/videos/about.mp4";
 // --- Static Data ---
 const profile = {
   name: "Landry Barb II",
-  title: "Senior Accessibility Engineer",
+  title: "Frontend Accessibility Engineer",
   status: "Available for Hire",
   location: "Los Angeles, CA",
   bio: "I’m a frontend engineer focused on accessibility for entertainment platforms where small design decisions can affect millions of users. My background in performance and digital platforms shapes how I think about audience experience, usability, and inclusion as an engineering discipline.",
@@ -21,39 +21,48 @@ const profile = {
   socials: [
     { label: "LinkedIn", url: "https://www.linkedin.com/in/landrybarb/", icon: Linkedin },
     { label: "GitHub", url: "https://github.com/LandryBarb", icon: Github },
-    { label: "Resume", url: "#", icon: Download }
+    { label: "Resume", url: "./resume.pdf", icon: Download }
   ]
 };
 
 const stats = [
-  { label: "Years Exp.", value: "3+", icon: Clock },
-  { label: "Audit Hours", value: "2k+", icon: CheckCircle2 },
-  { label: "WCAG Level", value: "AAA", icon: Award },
-  { label: "Components", value: "150+", icon: Briefcase },
+ { label: "Years Exp.",   value: "3.5+",    icon: Clock },
+{ label: "Audit Hours",   value: "150+",    icon: CheckCircle2 },
+{ label: "WCAG Level",    value: "2.1 AA",  icon: Award },
+{ label: "Components",    value: "25+",     icon: Briefcase },
+
+
+
 ];
 
 const experience = [
-  { 
-    id: 1,
-    role: "Senior Accessibility Engineer", 
-    company: "StreamCo (Global Streaming Service)", 
-    period: "2021 - Present",
-    desc: "Leading the accessibility remediation of a React Native TV app used by 5M+ subscribers. Established the 'Keyboard First' development culture and automated contrast testing in CI/CD." 
-  },
-  { 
-    id: 2,
-    role: "UI Engineer / A11y Lead", 
-    company: "FinTech Solutions", 
-    period: "2018 - 2021",
-    desc: "Built a high-contrast trading dashboard compliant with Section 508. Audited 40+ legacy screens for screen reader compatibility and trained the frontend team on ARIA best practices." 
-  },
-  { 
-    id: 3,
-    role: "Frontend Developer", 
-    company: "Creative Agency", 
-    period: "2015 - 2018",
-    desc: "Specialized in semantic HTML and performance optimization for large-scale marketing sites. Championed the shift to responsive, mobile-first design patterns." 
-  }
+{
+  id: 1,
+  role: "Web Developer",
+  company: "NEP Services",
+  period: "2024 – Present",
+  desc: "Webflow developer with self directed expertise in accessibility improvements across 500+ nonprofit and enterprise sites. Introduced semantic patterns, keyboard-friendly templates, and cross-browser a11y QA recommendations."
+},
+{
+  id: 2,
+  role: "Lead Web Developer",
+  company: "Shiloh Code",
+  period: "2022 – 2025",
+  desc: "Delivered ERP-integrated e-commerce systems and subscription workflows. Improved frontend accessibility in checkout flows and implemented predictable, mobile-first UI patterns."
+},
+{  id: 3,
+  role: "Amazon Delivery Driver",
+  company: "Various Constracts",
+  period: "2014 – 2022",
+  desc: "Responsible for delivering packages across multiple regions. Managed logistics, optimized delivery routes, and ensured timely and accurate deliveries while maintaining high customer satisfaction."
+},
+{
+  id: 4,
+  role: "Entertainment & Paraades Performer",
+  company: "Disneyland Resort",
+  period: "2010 – 2014",
+  desc: "Theme park performer in various parades and shows, engaging audiences and enhancing guest experiences through dynamic performances and character portrayals."
+}
 ];
 </script>
 

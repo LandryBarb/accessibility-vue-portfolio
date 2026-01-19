@@ -3,7 +3,6 @@ import { ref, computed, onMounted, nextTick } from 'vue';
 import { 
   Search, X, Filter, ChevronRight 
 } from 'lucide-vue-next';
-// Import both data sources
 import { caseStudies } from '../data/caseStudies';
 import { experiments } from '../data/experiments';
 
@@ -23,21 +22,19 @@ const categories = [
 ];
 
 // --- Data Normalization ---
-// Combine and standardize properties for search
 const allContent = computed(() => {
   const normExperiments = experiments.map(exp => ({
     ...exp,
-    // Map experiment-specific fields to the common schema used in the template
     genre: exp.category, 
     tagline: exp.desc,
     imageClass: exp.imageClass || 'poster-slate',
-    match: '100%', // Default match for local components
-    type: 'experiment' // Flag for routing
+    match: '100%', 
+    type: 'experiment'
   }));
 
   const normCaseStudies = caseStudies.map(cs => ({
     ...cs,
-    type: 'casestudy' // Flag for routing
+    type: 'casestudy'
   }));
 
   return [...normCaseStudies, ...normExperiments];
@@ -48,10 +45,8 @@ const filteredProjects = computed(() => {
   const query = searchQuery.value.toLowerCase().trim();
   
   return allContent.value.filter(item => {
-    // 1. Category Filter
     const matchesCategory = activeCategory.value === 'All' || item.genre === activeCategory.value;
     
-    // 2. Search Query (Checks Title, Tags, Stack, and Tagline/Desc)
     const searchableText = [
       item.title,
       item.tagline,
@@ -202,21 +197,18 @@ onMounted(() => {
   max-width: 1000px;
   margin: 0 auto;
   padding-top: var(--space-xl);
-  
-  @include respond-to('mobile') {
-    padding-top: var(--space-lg);
-  }
+  /* Ensure container doesn't overflow horizontally on mobile */
+  width: 100%;
+  overflow-x: hidden;
+  @include respond-to('mobile') { padding-top: var(--space-lg); }
 }
 
 /* --- HEADER --- */
-.search-header {
-  margin-bottom: var(--space-xl);
-}
+.search-header { margin-bottom: var(--space-xl); }
 
 .search-bar-wrapper {
   position: relative;
   margin-bottom: var(--space-lg);
-  
   .search-icon {
     position: absolute;
     left: 1rem;
@@ -236,16 +228,13 @@ onMounted(() => {
   padding: 1.2rem 3rem 1.2rem 3.5rem;
   border-radius: 8px;
   transition: all 0.2s var(--ease-cinematic);
-  
   &::placeholder { color: rgba(255,255,255,0.3); }
-  
   &:focus {
     background: var(--bg-surface-hover);
     border-color: var(--brand-primary);
     outline: none;
     box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
   }
-  
   @include respond-to('mobile') {
     font-size: 1.1rem;
     padding: 1rem 2.5rem 1rem 3rem;
@@ -268,16 +257,21 @@ onMounted(() => {
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s;
-  
   &:hover { background: rgba(255,255,255,0.2); color: white; }
 }
 
-/* --- FILTERS --- */
+/* --- FILTERS (Reusing TOC Strategy) --- */
+/* --- FILTERS (Updated) --- */
 .filter-row {
   display: flex;
   align-items: center;
   gap: var(--space-md);
-  flex-wrap: wrap;
+  
+  @include respond-to('mobile') {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+  }
 }
 
 .filter-label {
@@ -286,15 +280,39 @@ onMounted(() => {
   text-transform: uppercase;
   color: var(--text-tertiary);
   letter-spacing: 0.05em;
+  flex-shrink: 0;
+  @include respond-to('mobile') { margin-left: var(--space-2xs); }
 }
 
 .filter-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--space-xs);
+  
+  /* Desktop: Standard Flex */
+  
+  /* Mobile: Full-width Breakout Scroll */
+  @include respond-to('mobile') {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%); /* Breakout Trick */
+    margin-right: calc(-50vw + 50%);
+    
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    
+    /* Padding to align first item with content */
+    padding: 0 var(--space-sm) 4px var(--space-sm);
+    
+    /* Hide scrollbars */
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+  }
 }
 
 .filter-pill {
+  /* Crucial Fix: Prevent shrinking so they overflow properly */
+  flex-shrink: 0; 
+  
   background: transparent;
   border: 1px solid rgba(255,255,255,0.2);
   color: var(--text-secondary);
@@ -304,17 +322,15 @@ onMounted(() => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
   
-  &:hover { 
-    border-color: white; 
-    color: white; 
+  @include respond-to('mobile') {
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.05);
   }
   
-  &.is-active {
-    background: white;
-    color: black;
-    border-color: white;
-  }
+  &:hover { border-color: white; color: white; }
+  &.is-active { background: white; color: black; border-color: white; }
 }
 
 /* --- RESULTS AREA --- */
@@ -322,7 +338,6 @@ onMounted(() => {
   margin-bottom: var(--space-lg);
   color: var(--text-tertiary);
   font-size: 0.9rem;
-  
   .count { color: white; font-weight: 700; margin-right: 4px; }
   .query { font-style: italic; }
 }
@@ -331,12 +346,12 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
+  width: 100%;
+  max-width: 100%; 
 }
 
-/* --- SEARCH CARD (Horizontal List Style) --- */
-.search-card {
-  width: 100%;
-}
+/* --- SEARCH CARD --- */
+.search-card { width: 100%; }
 
 .card-link {
   display: block;
@@ -363,6 +378,12 @@ onMounted(() => {
   padding: var(--space-sm);
   gap: var(--space-md);
   transition: all 0.2s var(--ease-cinematic);
+  
+  @include respond-to('mobile') {
+    gap: 12px;
+    align-items: flex-start; 
+    padding: 12px;
+  }
 }
 
 .card-image {
@@ -379,32 +400,46 @@ onMounted(() => {
   &.poster-zinc { background: linear-gradient(135deg, #3f3f46, #000); }
   &.poster-neutral { background: linear-gradient(135deg, #525252, #000); }
   &.poster-dark { background: linear-gradient(135deg, #18181b, #000); }
+  &.poster-cyan { background: linear-gradient(135deg, #0e7490, #000); }
+  &.poster-indigo { background: linear-gradient(135deg, #3730a3, #000); }
+  &.poster-amber { background: linear-gradient(135deg, #d97706, #000); }
   
-  @include respond-to('mobile') { width: 80px; aspect-ratio: 1; }
+  @include respond-to('mobile') { 
+    width: 64px;
+    height: 64px; 
+    aspect-ratio: 1; 
+  }
 }
 
 .card-content {
   flex: 1;
   min-width: 0;
+  overflow: hidden;
 }
 
 .card-header {
   display: flex;
-  gap: var(--space-sm);
+  flex-wrap: wrap; 
+  gap: 6px 8px;
   font-size: 0.75rem;
   margin-bottom: 4px;
   
-  .card-genre { color: var(--text-tertiary); text-transform: uppercase; font-weight: 700; }
-  .card-match { color: var(--status-success); font-weight: 700; }
+  .card-genre { color: var(--text-tertiary); text-transform: uppercase; font-weight: 700; white-space: nowrap; }
+  .card-match { color: var(--status-success); font-weight: 700; white-space: nowrap; }
 }
 
 .card-title {
   font-size: 1.1rem;
   font-weight: 700;
   margin-bottom: 2px;
-  white-space: nowrap;
+  color: white;
+  
+  /* Robust multi-line truncation */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: 100%;
   
   @include respond-to('mobile') { font-size: 1rem; }
 }
@@ -413,11 +448,17 @@ onMounted(() => {
   font-size: 0.85rem;
   color: var(--text-tertiary);
   margin-bottom: var(--space-xs);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .card-tags {
   display: flex;
+  flex-wrap: wrap; 
   gap: 6px;
+  margin-top: 4px;
   
   .tag {
     font-size: 0.7rem;
@@ -425,6 +466,10 @@ onMounted(() => {
     background: rgba(255,255,255,0.1);
     padding: 2px 6px;
     border-radius: 4px;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
@@ -433,7 +478,7 @@ onMounted(() => {
   opacity: 0;
   transform: translateX(-10px);
   transition: all 0.2s ease;
-  
+  flex-shrink: 0;
   @include respond-to('mobile') { display: none; }
 }
 
@@ -442,7 +487,6 @@ onMounted(() => {
   text-align: center;
   padding: var(--space-2xl) 0;
   color: var(--text-tertiary);
-  
   .empty-icon-box {
     background: var(--bg-surface);
     width: 80px;
@@ -454,7 +498,6 @@ onMounted(() => {
     margin: 0 auto var(--space-md);
     color: var(--text-secondary);
   }
-  
   .empty-title { color: white; font-size: 1.25rem; margin-bottom: var(--space-xs); }
   .btn-reset { margin-top: var(--space-md); color: var(--brand-primary); background: none; border: none; font-weight: 700; cursor: pointer; &:hover { text-decoration: underline; } }
 }
@@ -462,13 +505,8 @@ onMounted(() => {
 /* ANIMATION */
 .grid-anim-move,
 .grid-anim-enter-active,
-.grid-anim-leave-active {
-  transition: all 0.3s var(--ease-cinematic);
-}
+.grid-anim-leave-active { transition: all 0.3s var(--ease-cinematic); }
 .grid-anim-enter-from,
-.grid-anim-leave-to {
-  opacity: 0;
-  transform: translateY(10px);
-}
+.grid-anim-leave-to { opacity: 0; transform: translateY(10px); }
 .grid-anim-leave-active { position: absolute; width: 100%; }
 </style>

@@ -9,9 +9,8 @@ import {
 
 // --- Assets ---
 // Placeholders - replace with your actual assets
-const FEATURED_IMAGE = 'https://images.unsplash.com/photo-1593789382576-54f489574d26?q=80&w=2070&auto=format&fit=crop'; 
-const FEATURED_VIDEO = 'https://assets.mixkit.co/videos/preview/mixkit-software-developer-working-on-code-monitor-close-up-1728-large.mp4';
-
+const FEATURED_IMAGE = './images/hero.png'; 
+const FEATURED_VIDEO = './videos/hero.mp4';
 // --- State ---
 const showVideo = ref(false);
 let timer = null;

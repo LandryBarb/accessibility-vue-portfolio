@@ -16,10 +16,13 @@ const featuredHero = {
 
 // --- Hover Video Logic ---
 const hoveredId = ref(null);
-const activeVideoId = ref(null); // The ID of the video currently playing
+const activeVideoId = ref(null);
 let hoverTimer = null;
 
 const handleMouseEnter = (id) => {
+  // OPTIMIZATION: Disable video hover logic on touch devices to prevent 'sticky' states
+  if (window.matchMedia('(hover: none)').matches) return;
+
   hoveredId.value = id;
   // Delay video playback by 800ms to prevent flashing while scrolling
   hoverTimer = setTimeout(() => {
@@ -65,7 +68,7 @@ onBeforeUnmount(() => {
         <div class="hero-actions">
           <router-link to="/case-studies/101" class="btn btn--white">
             <Play class="icon-fill" fill="currentColor" aria-hidden="true" />
-            <span>Read Case Study</span>
+            <span>Featured Case Study</span>
           </router-link>
         </div>
       </div>
@@ -171,8 +174,10 @@ onBeforeUnmount(() => {
   min-height: 100vh;
   width: 100%;
   padding-bottom: var(--space-2xl);
+  
+  /* Clear Fixed Bottom Nav on Mobile */
   @include respond-to('laptop') {
-    padding-bottom: calc(var(--mobile-nav-height) + var(--space-xl));
+    padding-bottom: calc(var(--mobile-nav-height) + var(--space-2xl));
   }
 }
 
@@ -199,8 +204,8 @@ onBeforeUnmount(() => {
     min-height: 45vh;
     align-items: center;
     text-align: center;
-    padding-top: var(--space-2xl);
-    padding-bottom: var(--space-lg);
+    padding-top: var(--space-3xl); /* Extra spacing for top status bar */
+    padding-bottom: var(--space-xl);
   }
 }
 
@@ -223,8 +228,11 @@ onBeforeUnmount(() => {
 }
 
 .hero-title {
-  font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 800; line-height: 1.1;
+  /* Fluid typography for better mobile scaling */
+  font-size: clamp(2rem, 5vw, 3.5rem); 
+  font-weight: 800; line-height: 1.1;
   margin-bottom: var(--space-xs); max-width: 25ch;
+  
   @include respond-to('mobile') { margin-inline: auto; }
 }
 
@@ -241,6 +249,7 @@ onBeforeUnmount(() => {
   display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px;
   border-radius: 6px; font-weight: 700; text-decoration: none; transition: transform 0.2s ease;
   font-size: 1rem;
+  
   &--white {
     background: white; color: black; border: 2px solid white;
     &:hover { background: rgba(255,255,255,0.9); transform: scale(1.02); }
@@ -258,10 +267,14 @@ onBeforeUnmount(() => {
 
 .poster-grid {
   display: grid;
+  /* Desktop: Responsive columns */
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: var(--space-lg) var(--space-md);
+  
+  /* Mobile: Smart grid that respects very small screens */
   @include respond-to('mobile') {
-    grid-template-columns: repeat(2, 1fr); 
+    /* Prevents squashing on < 320px width devices (e.g. Fold) */
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: var(--space-md) var(--space-sm);
   }
 }
@@ -291,14 +304,12 @@ onBeforeUnmount(() => {
   transition: all 0.3s var(--ease-cinematic);
   margin-bottom: var(--space-sm);
 
-  /* Fallback Gradients */
   &.poster-blue { background: linear-gradient(160deg, #1e3a8a 0%, #000 80%); }
   &.poster-purple { background: linear-gradient(160deg, #581c87 0%, #000 80%); }
   &.poster-emerald { background: linear-gradient(160deg, #064e3b 0%, #000 80%); }
   &.poster-orange { background: linear-gradient(160deg, #7c2d12 0%, #000 80%); }
 }
 
-/* Image & Video Layers */
 .poster-img {
   width: 100%; height: 100%; object-fit: cover;
   position: absolute; inset: 0; z-index: 1;
@@ -306,12 +317,10 @@ onBeforeUnmount(() => {
 
 .video-preview-wrapper {
   position: absolute; inset: 0; z-index: 2;
-  background: black; /* Prevent transparency flicker */
+  background: black; 
 }
 
-.poster-video {
-  width: 100%; height: 100%; object-fit: cover;
-}
+.poster-video { width: 100%; height: 100%; object-fit: cover; }
 
 .poster-badge {
   position: absolute; top: 8px; left: 8px;
@@ -327,7 +336,8 @@ onBeforeUnmount(() => {
   display: flex; align-items: center; justify-content: center;
   opacity: 0; transition: opacity 0.3s ease; z-index: 4;
   
-  &.is-hidden { display: none; } /* Hide play button when video is playing */
+  &.is-hidden { display: none; }
+  /* Hide hover overlay on mobile entirely to keep image clean */
   @include respond-to('mobile') { display: none; }
   
   .play-btn {
@@ -337,14 +347,12 @@ onBeforeUnmount(() => {
   }
 }
 
-/* Info */
 .card-info { padding: 0 2px; }
 
 .main-link {
   font-size: 1rem; font-weight: 700; text-decoration: none; color: inherit;
   transition: color 0.2s;
-  /* Stretched Link */
-  &::after { content: ''; position: absolute; inset: 0; z-index: 4; } /* Lower than actions z-index */
+  &::after { content: ''; position: absolute; inset: 0; z-index: 4; }
   &:focus-visible { outline: none; text-decoration: underline; }
 }
 

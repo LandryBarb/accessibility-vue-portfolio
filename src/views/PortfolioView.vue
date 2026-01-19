@@ -212,7 +212,7 @@ const filteredItems = computed(() => {
 .filter-list {
   display: flex;
   gap: var(--space-xs);
-  padding-bottom: 2px; /* Prevent scrollbar clip */
+  padding-block: 8px; /* Prevent scrollbar clip */
    @include respond-to('mobile') {
     flex-direction: column;
   }
