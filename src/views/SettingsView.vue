@@ -77,6 +77,7 @@ const sections = [
           <Settings class="header-icon" aria-hidden="true" />
         </div>
         <h1 class="page-title">Settings</h1>
+      
       </header>
 
       <div class="settings-groups">

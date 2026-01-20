@@ -167,26 +167,26 @@ const projects = [
       </div>
     </section>
 
-    <footer class="content-wrapper section-specs">
-      <div class="specs-grid">
-        <div class="spec">
-          <Monitor class="spec-icon" aria-hidden="true" />
-          <span><strong>Accessibility</strong> Specialist</span>
-        </div>
-        <div class="spec">
-          <CheckCircle2 class="spec-icon" aria-hidden="true" />
-          <span><strong>WCAG 2.2</strong> Expertise</span>
-        </div>
-        <div class="spec">
-          <AlertTriangle class="spec-icon text-warning" aria-hidden="true" />
-          <span><strong>Risk</strong> Mitigation</span>
-        </div>
-          <div class="spec">
-          <CodeXml class="spec-icon text-icon" aria-hidden="true" />
-          <span><strong>HTML5 / </strong> SCSS / Vue Js</span>
-        </div>
-      </div>
-    </footer>
+<footer class="content-wrapper section-specs">
+  <ul class="specs-grid" role="list">
+    <li class="spec">
+      <Monitor class="spec-icon" aria-hidden="true" />
+      <span><strong>Accessibility-First</strong> Frontend</span>
+    </li>
+    <li class="spec">
+      <CheckCircle2 class="spec-icon" aria-hidden="true" />
+      <span><strong>WCAG 2.2</strong> AA</span>
+    </li>
+    <li class="spec">
+      <AlertTriangle class="spec-icon" aria-hidden="true" />
+      <span><strong>Compliance & Risk</strong> Reduction</span>
+    </li>
+    <li class="spec">
+      <CodeXml class="spec-icon" aria-hidden="true" />
+      <span><strong>Vue + Semantic</strong> Components</span>
+    </li>
+  </ul>
+</footer>
 
   </div>
 </template>
