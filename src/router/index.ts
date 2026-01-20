@@ -1,5 +1,5 @@
 
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import CaseStudyView from "../views/CaseStudyView.vue";
 import CaseStudiesView from "../views/CaseStudiesView.vue";
@@ -77,7 +77,7 @@ const routes = [
 
 // Create the router instance with history mode for clean URLs.
 export const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes,
 });
 
