@@ -172,10 +172,6 @@ const sections = [
   gap: var(--space-2xl);
 }
 
-.settings-section {
-  /* Animation entry handled by global page transition */
-}
-
 .section-header {
   display: flex;
   align-items: center;
