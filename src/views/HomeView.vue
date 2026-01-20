@@ -175,7 +175,7 @@ const projects = [
         </div>
         <div class="spec">
           <CheckCircle2 class="spec-icon" aria-hidden="true" />
-          <span><strong>WCAG 2.2</strong> Certified</span>
+          <span><strong>WCAG 2.2</strong> Expertise</span>
         </div>
         <div class="spec">
           <AlertTriangle class="spec-icon text-warning" aria-hidden="true" />
@@ -183,7 +183,7 @@ const projects = [
         </div>
           <div class="spec">
           <CodeXml class="spec-icon text-icon" aria-hidden="true" />
-          <span><strong>Vue / </strong> Nuxt</span>
+          <span><strong>HTML5 / </strong> SCSS / Vue Js</span>
         </div>
       </div>
     </footer>

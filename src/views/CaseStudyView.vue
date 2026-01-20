@@ -451,11 +451,12 @@ watch(() => route.params.id, () => {
   background-size: cover;
   background-position: center;
   background-color: #111;
+  background-repeat: no-repeat;
   opacity: 0.4;
 }
 
 .bg-video-wrapper { z-index: var(--z-normal); }
-.bg-video { width: 100%; height: 100%; object-fit: cover; }
+.bg-video { width: 100%; height: 100%; object-fit: contain; }
 
 .bg-vignette { 
   z-index: 2; 

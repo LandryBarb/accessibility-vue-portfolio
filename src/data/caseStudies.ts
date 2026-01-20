@@ -465,7 +465,7 @@ export const caseStudies: CaseStudy[] = [
 
   role: "Accessibility Engineer",
   timeline: "1 Day",
-  stack: "Vue 3 / Vite / TypeScript",
+ stack: "HTML5 / SCSS / JavaScript",
 
   media: {
     heroImage: "/images/thumbnails/caseStudy_5_vertical.png",
@@ -627,7 +627,7 @@ export const caseStudies: CaseStudy[] = [
 
     role: "Accessibility Engineer",
     timeline: "1 Day",
-    stack: "Vue 3 / Vite / TypeScript",
+    stack: "HTML5 / SCSS / JavaScript",
 
     media: {
       heroImage: "/images/thumbnails/caseStudy_6_vertical.png",
@@ -843,7 +843,7 @@ export const caseStudies: CaseStudy[] = [
 
   role: "Accessibility Engineer",
   timeline: "1 Day",
-  stack: "Vue 3 / Vite / TypeScript",
+stack: "HTML5 / SCSS / JavaScript",
 
   media: {
    heroImage: "/images/thumbnails/caseStudy_7_vertical.png",
@@ -942,7 +942,148 @@ export const caseStudies: CaseStudy[] = [
       ]
     }
   }
+},
+
+{
+  id: 8,
+
+  title: "Left Rail Navigation — Streaming Genre Nav",
+  subtitle: "Fixing Keyboard Access & Disclosure Semantics",
+  tagline: "Landmarks, Skip Links, and WCAG 2.2 Focus Compliance",
+  genre: "Case Study",
+  tags: ["Navigation", "Skip Link", "Disclosure", "WCAG 2.2", "HTML5"],
+  imageClass: "poster-slate",
+  match: "95%",
+  compliance: "WCAG 2.2 AA",
+  saved: false,
+
+  role: "Accessibility Engineer",
+  timeline: "1 Day",
+  stack: "HTML /  SCSS / JavaScript",
+
+  media: {
+    heroImage: "/images/thumbnails/caseStudy_8_vertical.png",
+    auditScreenshot: "/images/audits/caseStudy_8_audit.png",
+    heroVideo: "/videos/caseStudy_8_remedy.mp4",
+    auditVideo: "/videos/caseStudy_8_remedy.mp4"
+  },
+
+  overview:
+    "Streaming UIs frequently ship persistent left-rail navigation built with clickable divs, missing landmarks, and inaccessible expand/collapse groups. This case study remediated a genre rail by implementing a proper nav landmark, skip navigation, semantic lists, and disclosure controls with explicit expanded state ensuring full keyboard operation and WCAG 2.2 focus visibility requirements.",
+
+  barriers: [
+    {
+      title: "Clickable Div Navigation Items",
+      wcag: "SC 2.1.1",
+      description:
+        "Genre items and controls were implemented as non-semantic div elements, preventing reliable keyboard access and assistive technology identification.",
+      severity: "Critical"
+    },
+    {
+      title: "Missing Navigation Landmark and Headings",
+      wcag: "SC 1.3.1",
+      description:
+        "The left rail was not exposed as a navigation landmark and section headings were not programmatic headings, reducing navigability for screen reader users.",
+      severity: "High"
+    },
+    {
+      title: "Disclosure Groups Lacked Programmatic State",
+      wcag: "SC 4.1.2",
+      description:
+        "Expandable micro-genre groups did not expose expanded/collapsed state or relationships, making sub-genre content unpredictable for assistive technologies.",
+      severity: "High"
+    },
+    {
+      title: "No Bypass Mechanism for Persistent Navigation",
+      wcag: "SC 2.4.1",
+      description:
+        "Users had to tab through the full left rail on every page load due to a missing skip link to main content.",
+      severity: "High"
+    }
+  ],
+
+  constraints: [
+    "Visual styling and layout parity maintained (no redesign).",
+    "Sticky behavior preserved; focus indicators could not be clipped.",
+    "Native HTML semantics preferred over ARIA-heavy patterns."
+  ],
+
+  remediation: {
+    fileName: "LeftRailGenres.vue",
+    codeSnippet: `<a class="skip-link" href="#main">Skip to main content</a>
+
+<nav aria-labelledby="lr-title">
+  <h2 id="lr-title">Streaming Genres</h2>
+
+  <button aria-expanded="false" aria-controls="lr-group-horror">
+    Horror vaults
+  </button>
+
+  <ul id="lr-group-horror" hidden>
+    <li><a href="/genres/horror-found">Found Footage</a></li>
+  </ul>
+</nav>`,
+    steps: [
+      "Converted the rail to a <nav> landmark with real headings for structural navigation.",
+      "Replaced clickable divs with native a tags and button elements for keyboard reliability.",
+      "Implemented disclosure groups using aria-expanded + aria-controls and hid collapsed content with the hidden attribute.",
+      "Added a skip link targeting <main> to bypass the persistent rail.",
+      "Added focus-visible styles and verified focus was not obscured in sticky/scroll states (WCAG 2.2)."
+    ]
+  },
+
+  verification: {
+    manualTesting: {
+      keyboard: true,
+      screenReaders: ["NVDA", "VoiceOver"]
+    },
+    automation: {
+      unit: [
+        "Vitest: render LeftRailGenres; assert aria-expanded toggles and hidden state updates"
+      ],
+      e2e: [
+        "axe DevTools (page scan)", "WAVE (structure validation)"
+      ]
+    },
+    summary:
+      "Keyboard users could bypass the rail, expand/collapse groups, and navigate all links without focus loss. Screen readers exposed the rail as a navigation landmark with headings and correctly announced disclosure states and current location."
+  },
+
+  impact: {
+    quote:
+      "Navigation became fully keyboard-operable with predictable structure and disclosure behavior, reducing repeated-navigation fatigue and meeting WCAG 2.2 focus requirements.",
+    author: "Accessibility Verification Notes",
+    context: "Post-Remediation Validation"
+  },
+
+  appendix: {
+    accessibilityContract: {
+      keyboardSupport: [
+        "Tab/Shift+Tab moves through links and buttons in a logical order",
+        "Enter activates links and toggles disclosure buttons",
+        "Collapsed sub-genre content is removed from the tab order"
+      ],
+      ariaUsage: [
+        "aria-current='page' for the active genre route",
+        "aria-expanded and aria-controls on disclosure toggles"
+      ],
+      focusBehavior:
+        "Visible focus indicator on all interactive elements; focus is not clipped within sticky/scroll containers.",
+      screenReaderExpectations: [
+        "Nav landmark discoverable via landmarks list",
+        "Section headings discoverable via heading navigation",
+        "Disclosure toggles announce expanded/collapsed state"
+      ]
+    },
+    knownLimitations: [
+      "Touch target sizing may require additional spacing for strict mobile heuristics depending on final CSS."
+    ],
+    regressionNotes:
+      "Re-test focus visibility after any overflow/sticky CSS changes and verify aria-current remains accurate after routing refactors."
+  }
 }
+
+
 
 
 ];
