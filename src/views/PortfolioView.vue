@@ -31,7 +31,7 @@ const filteredItems = computed(() => {
     <header class="content-wrapper header">
       <div class="header__eyebrow">
         <Code2 class="icon" aria-hidden="true" />
-        <span>Experiments Lab</span>
+        <span>Portfolio</span>
       </div>
       <h1 class="header__title">Component Library & Prototypes</h1>
       <p class="header__desc">
@@ -173,17 +173,25 @@ const filteredItems = computed(() => {
   border-bottom: 1px solid rgba(255,255,255,0.1);
   padding: var(--space-md) 0;
   margin-bottom: var(--space-xl);
+  /* Mobile: Tweak padding to match SidebarTOC look */
+  @include respond-to('laptop') {
+    padding: var(--space-sm) 0;
+  }
 }
 
 .filter-container {
   display: flex;
   align-items: center;
   gap: var(--space-md);
-    @include respond-to('mobile') {
-    flex-direction: column;
+    // @include respond-to('mobile') {
+    // flex-direction: column;
+    /* Mobile: Remove layout gap as label is hidden and list breaks out */
+  @include respond-to('laptop') {
+    display: block; 
+    padding: 0; /* Remove wrapper padding so breakout works perfectly */
+  }
     
   }
-}
 
 .filter-label {
   display: flex;
@@ -195,6 +203,8 @@ const filteredItems = computed(() => {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   flex-shrink: 0;
+  /* Hide label on mobile to mimic SidebarTOC clean look */
+  @include respond-to('laptop') { display: none; }
 }
 
 /* Responsive Horizontal Scroll Area */
@@ -207,14 +217,30 @@ const filteredItems = computed(() => {
   
   /* Mask fade effect on edges if content overflows (optional enhancement) */
   mask-image: linear-gradient(to right, transparent, black 10px, black 95%, transparent);
+
+  /* Mobile: Full-width breakout logic (Same as SidebarTOC) */
+  @include respond-to('laptop') {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%); /* Break out of parent constraints */
+    margin-right: calc(-50vw + 50%);
+    
+    /* Add padding to the scroll container itself */
+    padding: 0 var(--space-md);
+    
+    /* Reset mask for mobile or adjust if needed */
+    mask-image: linear-gradient(to right, transparent, black 10px, black 90%, transparent);
+  }
 }
 
 .filter-list {
   display: flex;
   gap: var(--space-xs);
   padding-block: 8px; /* Prevent scrollbar clip */
-   @include respond-to('mobile') {
-    flex-direction: column;
+  padding-inline-start: 8px;
+   @include respond-to('laptop') {
+    /* Ensure pills don't wrap on mobile */
+    flex-wrap: nowrap;
+    width: max-content; /* Allow container to grow */
   }
 }
 

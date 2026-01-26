@@ -2,9 +2,9 @@
 import { ref, computed, nextTick, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { caseStudies } from '../data/caseStudies';
-import { 
-  ArrowLeft, Calendar, User, Layout, Eye, 
-  AlertTriangle, CheckCircle2, Code2, Terminal, 
+import {
+  ArrowLeft, Calendar, User, Layout, Eye,
+  AlertTriangle, CheckCircle2, Code2, Terminal,
   Play, Video, FileText, ChevronDown, ChevronRight,
   ShieldCheck, Monitor
 } from 'lucide-vue-next';
@@ -63,7 +63,7 @@ const scrollTo = (id) => {
   if (el) {
     const isMobile = window.innerWidth < 1024;
     const offset = isMobile ? 120 : 80;
-    
+
     const bodyRect = document.body.getBoundingClientRect().top;
     const elementRect = el.getBoundingClientRect().top;
     const elementPosition = elementRect - bodyRect;
@@ -73,16 +73,22 @@ const scrollTo = (id) => {
       top: offsetPosition,
       behavior: 'smooth'
     });
-    
+
     activeSection.value = id;
   }
 };
 
 // --- Video Logic ---
 const showHeroVideo = ref(false);
+let heroTimer = null;
+
+// Audit Video State
 const isAuditPlaying = ref(false);
 const auditVideoRef = ref(null);
-let heroTimer = null;
+
+// Remediation Video State (New)
+const isRemediationPlaying = ref(false);
+const remediationVideoRef = ref(null);
 
 const initHeroTimer = () => {
   const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -92,11 +98,32 @@ const initHeroTimer = () => {
 };
 
 const playAuditVideo = async () => {
+  // MUTEX: Stop the other video
+  isRemediationPlaying.value = false;
+  // if (auditVideoRef.value) {
+  //   auditVideoRef.value.pause();
+  //   auditVideoRef.value.currentTime = 0;
+  // }
+
   isAuditPlaying.value = true;
   await nextTick();
   if (auditVideoRef.value) {
     auditVideoRef.value.focus();
   }
+};
+
+const playRemediationVideo = async () => {
+
+  // MUTEX: Stop the other video
+  isAuditPlaying.value = false;
+    // if (remediationVideoRef.value) {
+    //   remediationVideoRef.value.pause();
+    //   remediationVideoRef.value.currentTime = 0;
+    // }
+
+  isRemediationPlaying.value = true;
+  await nextTick();
+  if (remediationVideoRef.value) remediationVideoRef.value.focus();
 };
 
 // --- Lifecycle ---
@@ -113,6 +140,7 @@ onBeforeUnmount(() => {
 watch(() => route.params.id, () => {
   showHeroVideo.value = false;
   isAuditPlaying.value = false;
+  isRemediationPlaying.value = false; // Reset new state
   if (heroTimer) clearTimeout(heroTimer);
   nextTick(() => {
     initHeroTimer();
@@ -124,15 +152,15 @@ watch(() => route.params.id, () => {
 
 <template>
   <div class="page-container">
-    
+
     <header class="hero" role="banner">
       <div class="hero__bg" aria-hidden="true">
         <div class="bg-layer bg-image" :style="{ backgroundImage: `url(${project.media.heroImage})` }"></div>
         <transition name="crossfade">
           <div v-if="showHeroVideo && project.media.heroVideo" class="bg-layer bg-video-wrapper">
-             <video class="bg-video" autoplay muted loop playsinline>
-               <source :src="project.media.heroVideo" type="video/mp4">
-             </video>
+            <video class="bg-video" autoplay muted loop playsinline>
+              <source :src="project.media.heroVideo" type="video/mp4">
+            </video>
           </div>
         </transition>
         <div class="bg-layer bg-vignette"></div>
@@ -152,15 +180,21 @@ watch(() => route.params.id, () => {
 
         <dl class="hero__meta">
           <div class="meta-item">
-            <dt><User size="16" class="icon" /></dt>
+            <dt>
+              <User size="16" class="icon" />
+            </dt>
             <dd>{{ project.role }}</dd>
           </div>
           <div class="meta-item">
-            <dt><Calendar size="16" class="icon" /></dt>
+            <dt>
+              <Calendar size="16" class="icon" />
+            </dt>
             <dd>{{ project.timeline }}</dd>
           </div>
           <div class="meta-item">
-            <dt><Layout size="16" class="icon" /></dt>
+            <dt>
+              <Layout size="16" class="icon" />
+            </dt>
             <dd>{{ project.stack }}</dd>
           </div>
         </dl>
@@ -168,17 +202,13 @@ watch(() => route.params.id, () => {
     </header>
 
     <div class="content-wrapper layout-grid">
-      
+
       <aside class="sidebar-toc">
         <nav aria-label="Table of Contents" class="toc-nav">
           <ul class="toc-list">
             <li v-for="item in toc" :key="item.id">
-              <button 
-                @click="scrollTo(item.id)" 
-                class="toc-link"
-                :class="{ 'is-active': activeSection === item.id }"
-                :aria-current="activeSection === item.id ? 'true' : undefined"
-              >
+              <button @click="scrollTo(item.id)" class="toc-link" :class="{ 'is-active': activeSection === item.id }"
+                :aria-current="activeSection === item.id ? 'true' : undefined">
                 {{ item.label }}
               </button>
             </li>
@@ -187,7 +217,7 @@ watch(() => route.params.id, () => {
       </aside>
 
       <main class="article-content">
-        
+
         <section id="overview" class="section-block">
           <h2 class="section-heading">
             <Eye class="heading-icon" aria-hidden="true" />
@@ -218,27 +248,64 @@ watch(() => route.params.id, () => {
         <section id="evidence" class="section-block">
           <h2 class="section-heading">
             <Video class="heading-icon text-highlight" aria-hidden="true" />
-            Evidence
+            Evidence & Remediation
           </h2>
-          <figure class="media-container">
-            <transition name="fade" mode="out-in">
-              <div v-if="!isAuditPlaying || !project.media.auditVideo" class="media-placeholder" key="image">
-                <img :src="project.media.auditScreenshot" alt="Audit Screenshot" class="media-image" />
-                <div v-if="project.media.auditVideo" class="media-overlay">
-                  <button class="play-fab" @click="playAuditVideo" aria-label="Play audit video">
-                    <Play fill="currentColor" size="32" class="play-icon" />
-                  </button>
-                  <span class="overlay-label">Watch Audit</span>
-                </div>
-              </div>
-              <div v-else class="media-player-wrapper" key="video">
-                <video ref="auditVideoRef" class="media-video" controls autoplay tabindex="0">
-                  <source :src="project.media.auditVideo" type="video/mp4">
-                  Your browser does not support the video tag.
-                </video>
-              </div>
-            </transition>
-          </figure>
+          <div class="evidence-grid">
+            <div class="evidence-col">
+              <h3 class="evidence-label text-error">
+                <AlertTriangle size="16" /> Before: Audit Findings
+              </h3>
+              <figure class="media-container">
+                <transition name="fade" mode="out-in">
+                  <div v-if="!isAuditPlaying || !project.media.auditVideo" class="media-placeholder" key="image">
+                    <img :src="project.media.auditScreenshot" alt="Audit Screenshot" class="media-image" />
+                    <div v-if="project.media.auditVideo" class="media-overlay">
+                      <button class="play-fab" @click="playAuditVideo" aria-label="Play audit video">
+                        <Play fill="currentColor" size="32" class="play-icon" />
+                      </button>
+                      <span class="overlay-label">Watch Audit</span>
+                    </div>
+                  </div>
+                  <div v-else class="media-player-wrapper" key="video">
+                    <video ref="auditVideoRef" class="media-video" controls autoplay tabindex="0">
+                      <source :src="project.media.auditVideo" type="video/mp4">
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                </transition>
+              </figure>
+            </div>
+
+            <div v-if="project.media.remediationScreenshot || project.media.remediationVideo" class="evidence-col">
+              <h3 class="evidence-label text-success">
+                <CheckCircle2 size="16" /> After: Remediated
+              </h3>
+
+              <figure class="media-container">
+                <transition name="fade" mode="out-in">
+                  <div v-if="!isRemediationPlaying || !project.media.remediationVideo" class="media-placeholder"
+                    key="image">
+                    <img :src="project.media.remediationScreenshot || project.media.auditScreenshot"
+                      alt="Fixed State Screenshot" class="media-image" />
+                    <div v-if="project.media.remediationVideo" class="media-overlay">
+                      <button class="play-fab success" @click="playRemediationVideo"
+                        aria-label="Play remediation video">
+                        <Play fill="currentColor" size="32" class="play-icon" />
+                      </button>
+                      <span class="overlay-label">Watch Fix</span>
+                    </div>
+                  </div>
+                  <div v-else class="media-player-wrapper" key="video">
+                    <video ref="remediationVideoRef" class="media-video" controls autoplay tabindex="0">
+                      <source :src="project.media.remediationVideo" type="video/mp4">
+                    </video>
+                  </div>
+                </transition>
+              </figure>
+            </div>
+
+          </div>
+
         </section>
 
         <section id="constraints" class="section-block">
@@ -293,7 +360,7 @@ watch(() => route.params.id, () => {
             <ShieldCheck class="heading-icon text-success" aria-hidden="true" />
             Verification
           </h2>
-          
+
           <div class="verification-grid">
             <div class="verify-card manual">
               <h3 class="verify-title">Manual Testing</h3>
@@ -306,11 +373,12 @@ watch(() => route.params.id, () => {
               <div class="verify-row stack">
                 <span class="verify-label">Screen Readers:</span>
                 <div class="tags">
-                  <span v-for="sr in project.verification.manualTesting.screenReaders" :key="sr" class="sr-tag">{{ sr }}</span>
+                  <span v-for="sr in project.verification.manualTesting.screenReaders" :key="sr" class="sr-tag">{{ sr
+                    }}</span>
                 </div>
               </div>
             </div>
-            
+
             <div v-if="project.verification.automation" class="verify-card auto">
               <h3 class="verify-title">Automation</h3>
               <ul class="test-list">
@@ -326,7 +394,9 @@ watch(() => route.params.id, () => {
               <div class="evidence-details">
                 <div class="detail-row">
                   <strong>Steps:</strong>
-                  <ul><li v-for="step in ev.reproSteps" :key="step">{{ step }}</li></ul>
+                  <ul>
+                    <li v-for="step in ev.reproSteps" :key="step">{{ step }}</li>
+                  </ul>
                 </div>
                 <div class="detail-row">
                   <strong>Expected:</strong> <span class="text-success">{{ ev.expectedResult }}</span>
@@ -360,13 +430,14 @@ watch(() => route.params.id, () => {
         <section v-if="project.appendix" id="appendix" class="section-block appendix-section">
           <details class="appendix-details">
             <summary class="appendix-summary">
-              <FileText size="16" /><span>Appendix</span><ChevronDown class="chevron" />
+              <FileText size="16" /><span>Appendix</span>
+              <ChevronDown class="chevron" />
             </summary>
             <div class="appendix-content">
               <ul v-if="project.appendix.knownLimitations">
                 <li v-for="lim in project.appendix.knownLimitations" :key="lim">{{ lim }}</li>
               </ul>
-              
+
               <div v-if="project.appendix.defectLog?.length" class="defect-log">
                 <h4>Defect Log / Audits</h4>
                 <div class="table-responsive">
@@ -409,7 +480,7 @@ watch(() => route.params.id, () => {
   text-transform: uppercase;
   margin: var(--space-lg) 0 var(--space-md);
   letter-spacing: 0.05em;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding-bottom: var(--space-xs);
 }
 
@@ -428,7 +499,7 @@ watch(() => route.params.id, () => {
   @include respond-to('laptop') {
     min-height: 45vh;
     padding-bottom: var(--space-lg);
-    align-items: center; 
+    align-items: center;
   }
 }
 
@@ -455,12 +526,19 @@ watch(() => route.params.id, () => {
   opacity: 0.4;
 }
 
-.bg-video-wrapper { z-index: var(--z-normal); }
-.bg-video { width: 100%; height: 100%; object-fit: contain; }
+.bg-video-wrapper {
+  z-index: var(--z-normal);
+}
 
-.bg-vignette { 
-  z-index: 2; 
-  background: linear-gradient(to top, var(--bg-body) 15%, rgba(0,0,0,0.8) 100%);
+.bg-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.bg-vignette {
+  z-index: 2;
+  background: linear-gradient(to top, var(--bg-body) 15%, rgba(0, 0, 0, 0.8) 100%);
 }
 
 .hero__content {
@@ -480,11 +558,15 @@ watch(() => route.params.id, () => {
   text-decoration: none;
   margin-bottom: var(--space-lg);
   transition: color var(--duration-fast);
-  
-  &:hover { color: var(--brand-primary); }
+
+  &:hover {
+    color: var(--brand-primary);
+  }
 }
 
-.hero__header-group { margin-bottom: var(--space-lg); }
+.hero__header-group {
+  margin-bottom: var(--space-lg);
+}
 
 .compliance-pill {
   display: inline-block;
@@ -519,10 +601,12 @@ watch(() => route.params.id, () => {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-xl);
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: var(--space-md);
-  
-  @include respond-to('mobile') { gap: var(--space-md); }
+
+  @include respond-to('mobile') {
+    gap: var(--space-md);
+  }
 
   .meta-item {
     display: flex;
@@ -530,7 +614,10 @@ watch(() => route.params.id, () => {
     gap: var(--space-sm);
     color: var(--text-secondary);
     font-size: var(--text-sm);
-    .icon { color: var(--brand-primary); }
+
+    .icon {
+      color: var(--brand-primary);
+    }
   }
 }
 
@@ -540,7 +627,7 @@ watch(() => route.params.id, () => {
   grid-template-columns: var(--sidebar-width) 1fr;
   gap: var(--space-2xl);
   align-items: start;
-  
+
   @include respond-to('laptop') {
     grid-template-columns: 100%;
     gap: var(--space-lg);
@@ -552,7 +639,7 @@ watch(() => route.params.id, () => {
   position: sticky;
   top: var(--space-2xl);
   height: fit-content;
-  
+
   @include respond-to('laptop') {
     position: sticky;
     top: 0;
@@ -564,20 +651,23 @@ watch(() => route.params.id, () => {
     backdrop-filter: blur(10px);
     margin: 0 calc(var(--space-sm) * -1);
     padding: var(--space-sm);
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     margin-bottom: var(--space-xl);
   }
 }
 
-.toc-nav { width: 100%; overflow: hidden; }
+.toc-nav {
+  width: 100%;
+  overflow: hidden;
+}
 
 .toc-list {
   list-style: none;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  border-left: 2px solid rgba(255,255,255,0.05);
-  
+  border-left: 2px solid rgba(255, 255, 255, 0.05);
+
   @include respond-to('laptop') {
     flex-direction: row;
     border-left: none;
@@ -587,7 +677,10 @@ watch(() => route.params.id, () => {
     padding-bottom: 8px;
     gap: var(--space-sm);
     scrollbar-width: none;
-    &::-webkit-scrollbar { display: none; }
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 
@@ -604,21 +697,24 @@ watch(() => route.params.id, () => {
   margin-left: -2px;
   transition: all var(--duration-fast);
 
-  &:hover { color: var(--text-primary); }
+  &:hover {
+    color: var(--text-primary);
+  }
 
   &.is-active {
     color: var(--brand-primary);
     border-left-color: var(--brand-primary);
     font-weight: 600;
   }
-  
+
   @include respond-to('laptop') {
     white-space: nowrap;
     border-left: none;
     margin-left: 0;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     padding: 6px 12px;
     border-radius: 99px;
+
     &.is-active {
       background: var(--brand-primary);
       color: white;
@@ -631,7 +727,10 @@ watch(() => route.params.id, () => {
   max-width: 80ch;
   width: 100%;
   min-width: 0;
-  @include respond-to('laptop') { padding: 0 var(--space-sm); }
+
+  @include respond-to('laptop') {
+    padding: 0 var(--space-sm);
+  }
 }
 
 .section-block {
@@ -647,13 +746,34 @@ watch(() => route.params.id, () => {
   align-items: center;
   gap: var(--space-sm);
   color: var(--text-primary);
-  .heading-icon { opacity: 0.8; }
-  .text-warning { color: var(--status-warning); }
-  .text-accent { color: var(--code-purple); }
-  .text-brand { color: var(--brand-primary); }
-  .text-success { color: var(--status-success); }
-  .text-info { color: var(--status-info); }
-  .text-highlight { color: var(--text-primary); }
+
+  .heading-icon {
+    opacity: 0.8;
+  }
+
+  .text-warning {
+    color: var(--status-warning);
+  }
+
+  .text-accent {
+    color: var(--code-purple);
+  }
+
+  .text-brand {
+    color: var(--brand-primary);
+  }
+
+  .text-success {
+    color: var(--status-success);
+  }
+
+  .text-info {
+    color: var(--status-info);
+  }
+
+  .text-highlight {
+    color: var(--text-primary);
+  }
 }
 
 .text-body {
@@ -685,19 +805,74 @@ watch(() => route.params.id, () => {
   flex-wrap: wrap;
 }
 
-.barrier-title { color: #fca5a5; font-weight: 700; font-size: var(--text-body); }
-.wcag-badge { font-family: var(--font-mono); font-size: var(--text-xs); color: rgba(252, 165, 165, 0.8); border: 1px solid rgba(252, 165, 165, 0.3); padding: 1px 4px; border-radius: 2px; }
-.barrier-desc { font-size: var(--text-sm); color: var(--text-secondary); margin-bottom: var(--space-sm); }
-.tag--error { font-size: var(--text-xs); font-weight: 700; text-transform: uppercase; color: #fca5a5; }
+.barrier-title {
+  color: #fca5a5;
+  font-weight: 700;
+  font-size: var(--text-body);
+}
+
+.wcag-badge {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: rgba(252, 165, 165, 0.8);
+  border: 1px solid rgba(252, 165, 165, 0.3);
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.barrier-desc {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+}
+
+.tag--error {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #fca5a5;
+}
 
 /* --- EVIDENCE MEDIA --- */
+.evidence-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+  
+  @include respond-to('tablet') {
+    grid-template-columns: 1fr; /* Stack on mobile/tablet */
+    gap: var(--space-lg);
+  }
+}
+
+.evidence-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.evidence-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  
+  &.text-error { color: #fca5a5; }
+  &.text-success { color: var(--status-success); }
+}
+
 .media-container {
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   overflow: hidden;
   background: #000;
   aspect-ratio: 16/9;
   width: 100%;
+  position: relative;
 }
 
 .media-placeholder {
@@ -708,10 +883,14 @@ watch(() => route.params.id, () => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  &:hover .media-image { opacity: 0.6; }
+
+  &:hover .media-image {
+    opacity: 0.6;
+  }
 }
 
-.media-image, .media-video {
+.media-image,
+.media-video {
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -727,21 +906,40 @@ watch(() => route.params.id, () => {
   z-index: 2;
 }
 
+
+
 .play-fab {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   border: 2px solid white;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: transform var(--duration-fast);
-  &:hover { transform: scale(1.1); background: var(--brand-primary); border-color: var(--brand-primary); }
+
+  &:hover {
+    transform: scale(1.1);
+    background: var(--brand-primary);
+    border-color: var(--brand-primary);
+  }
+  &.success {
+    &:hover {
+      background: var(--status-success);
+      border-color: var(--status-success);
+    }
+  }
+
 }
 
-.overlay-label { font-weight: 700; text-transform: uppercase; font-size: var(--text-xs); text-shadow: 0 2px 4px black; }
+.overlay-label {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: var(--text-xs);
+  text-shadow: 0 2px 4px black;
+}
 
 /* --- CONSTRAINTS --- */
 .list-constraints {
@@ -749,10 +947,12 @@ watch(() => route.params.id, () => {
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+
   li {
     position: relative;
     padding-left: var(--space-lg);
     color: var(--text-secondary);
+
     &::before {
       content: "→";
       position: absolute;
@@ -765,22 +965,37 @@ watch(() => route.params.id, () => {
 /* --- REMEDIATION --- */
 .code-window {
   background: #0f172a;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 6px;
   overflow: hidden;
   margin-bottom: var(--space-lg);
 }
 
 .window-header {
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   padding: 8px 12px;
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.file-name { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-tertiary); }
-.window-controls { display: flex; gap: 4px; .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.1); } }
+.file-name {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+.window-controls {
+  display: flex;
+  gap: 4px;
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
 
 .code-block {
   padding: var(--space-md);
@@ -796,8 +1011,19 @@ watch(() => route.params.id, () => {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
-  .step { display: flex; gap: var(--space-md); }
-  .step-num { font-family: var(--font-mono); color: var(--brand-primary); font-weight: 700; opacity: 0.6; min-width: 2ch; }
+
+  .step {
+    display: flex;
+    gap: var(--space-md);
+  }
+
+  .step-num {
+    font-family: var(--font-mono);
+    color: var(--brand-primary);
+    font-weight: 700;
+    opacity: 0.6;
+    min-width: 2ch;
+  }
 }
 
 /* --- NEW: REMEDIATION PATTERNS --- */
@@ -809,8 +1035,8 @@ watch(() => route.params.id, () => {
 }
 
 .pattern-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: var(--space-md);
   border-radius: 6px;
 }
@@ -819,22 +1045,37 @@ watch(() => route.params.id, () => {
   display: flex;
   flex-direction: column;
   margin-bottom: var(--space-sm);
-  .pattern-id { font-family: var(--font-mono); font-size: 0.75rem; color: var(--brand-primary); }
-  .pattern-summary { font-weight: 600; color: var(--text-primary); }
+
+  .pattern-id {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--brand-primary);
+  }
+
+  .pattern-summary {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
 }
 
 .pattern-meta {
   font-size: 0.85rem;
   color: var(--text-secondary);
   margin-bottom: var(--space-sm);
-  .meta-label { color: var(--text-tertiary); font-size: 0.75rem; text-transform: uppercase; margin-right: 4px; }
+
+  .meta-label {
+    color: var(--text-tertiary);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    margin-right: 4px;
+  }
 }
 
 .wcag-tag {
   display: inline-block;
   font-size: 0.7rem;
   padding: 2px 6px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   margin-right: 4px;
 }
@@ -845,45 +1086,115 @@ watch(() => route.params.id, () => {
   grid-template-columns: 1fr 1fr;
   gap: var(--space-md);
   margin-bottom: var(--space-md);
-  
-  @include respond-to('mobile') { grid-template-columns: 1fr; }
+
+  @include respond-to('mobile') {
+    grid-template-columns: 1fr;
+  }
 }
 
 .verify-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   padding: var(--space-md);
   border-radius: 6px;
-  &.manual { border-top: 2px solid var(--status-success); }
-  &.auto { border-top: 2px solid var(--status-info); }
+
+  &.manual {
+    border-top: 2px solid var(--status-success);
+  }
+
+  &.auto {
+    border-top: 2px solid var(--status-info);
+  }
 }
 
-.verify-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: var(--space-md); }
-.verify-row { display: flex; align-items: center; gap: var(--space-sm); font-size: 0.9rem; margin-bottom: var(--space-sm); &.stack { flex-direction: column; align-items: flex-start; } }
-.verify-label { color: var(--text-tertiary); }
-.verify-status.passed { color: var(--status-success); display: flex; align-items: center; gap: 4px; font-weight: 600; }
-.sr-tag { display: inline-block; background: rgba(255,255,255,0.1); font-size: var(--text-xs); padding: 2px 6px; border-radius: 4px; margin-right: 4px; margin-bottom: 4px; }
-.test-list { list-style: disc; padding-left: 1.2rem; color: var(--text-secondary); font-size: var(--text-sm); }
-.summary-text { font-style: italic; border-left: 2px solid var(--text-tertiary); padding-left: var(--space-md); }
+.verify-title {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+}
+
+.verify-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 0.9rem;
+  margin-bottom: var(--space-sm);
+
+  &.stack {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.verify-label {
+  color: var(--text-tertiary);
+}
+
+.verify-status.passed {
+  color: var(--status-success);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+
+.sr-tag {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: var(--text-xs);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 4px;
+  margin-bottom: 4px;
+}
+
+.test-list {
+  list-style: disc;
+  padding-left: 1.2rem;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.summary-text {
+  font-style: italic;
+  border-left: 2px solid var(--text-tertiary);
+  padding-left: var(--space-md);
+}
 
 /* --- NEW: EVIDENCE LIST --- */
 .evidence-list {
   margin-top: var(--space-lg);
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: var(--space-md);
 }
 
 .evidence-item {
   margin-bottom: var(--space-lg);
-  .evidence-summary { color: var(--text-primary); margin-bottom: var(--space-xs); font-size: 1rem; }
-  .evidence-details { 
-    background: rgba(0,0,0,0.2); 
-    padding: var(--space-md); 
-    border-radius: 6px; 
+
+  .evidence-summary {
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+    font-size: 1rem;
+  }
+
+  .evidence-details {
+    background: rgba(0, 0, 0, 0.2);
+    padding: var(--space-md);
+    border-radius: 6px;
     font-size: 0.9rem;
   }
-  .detail-row { margin-bottom: var(--space-sm); }
-  ul { padding-left: 1.2rem; margin-top: 4px; color: var(--text-secondary); }
+
+  .detail-row {
+    margin-bottom: var(--space-sm);
+  }
+
+  ul {
+    padding-left: 1.2rem;
+    margin-top: 4px;
+    color: var(--text-secondary);
+  }
 }
 
 /* --- IMPACT --- */
@@ -892,22 +1203,86 @@ watch(() => route.params.id, () => {
   border: 1px solid rgba(59, 130, 246, 0.2);
   padding: var(--space-xl);
   border-radius: 8px;
-  @include respond-to('mobile') { padding: var(--space-lg); }
+
+  @include respond-to('mobile') {
+    padding: var(--space-lg);
+  }
 }
 
-.impact-quote { font-size: var(--text-h2); color: var(--text-primary); font-style: italic; margin-bottom: var(--space-lg); }
-.author-meta { display: flex; flex-direction: column; font-size: 0.9rem; strong { color: var(--text-primary); } span { color: var(--text-tertiary); } }
+.impact-quote {
+  font-size: var(--text-h2);
+  color: var(--text-primary);
+  font-style: italic;
+  margin-bottom: var(--space-lg);
+}
+
+.author-meta {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+
+  strong {
+    color: var(--text-primary);
+  }
+
+  span {
+    color: var(--text-tertiary);
+  }
+}
 
 /* --- APPENDIX --- */
-.appendix-section { border-top: 1px solid rgba(255,255,255,0.1); padding-top: var(--space-lg); }
-.appendix-details { background: rgba(0,0,0,0.2); border-radius: 6px; }
-.appendix-summary { padding: var(--space-md); cursor: pointer; display: flex; align-items: center; gap: var(--space-sm); font-weight: 600; color: var(--text-secondary); &:hover { color: var(--text-primary); } .chevron { margin-left: auto; transition: transform var(--duration-fast); } }
-.appendix-details[open] .chevron { transform: rotate(180deg); }
-.appendix-content { padding: 0 var(--space-md) var(--space-md); color: var(--text-secondary); font-size: 0.9rem; ul { padding-left: 1.2rem; } }
+.appendix-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: var(--space-lg);
+}
+
+.appendix-details {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.appendix-summary {
+  padding: var(--space-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+
+  &:hover {
+    color: var(--text-primary);
+  }
+
+  .chevron {
+    margin-left: auto;
+    transition: transform var(--duration-fast);
+  }
+}
+
+.appendix-details[open] .chevron {
+  transform: rotate(180deg);
+}
+
+.appendix-content {
+  padding: 0 var(--space-md) var(--space-md);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+
+  ul {
+    padding-left: 1.2rem;
+  }
+}
 
 /* --- NEW: DEFECT LOG TABLE --- */
-.defect-log { margin-top: var(--space-lg); }
-.defect-log h4 { margin-bottom: var(--space-sm); color: var(--text-secondary); }
+.defect-log {
+  margin-top: var(--space-lg);
+}
+
+.defect-log h4 {
+  margin-bottom: var(--space-sm);
+  color: var(--text-secondary);
+}
 
 /* Responsive Table Container */
 .table-responsive {
@@ -923,30 +1298,62 @@ watch(() => route.params.id, () => {
 .defect-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 600px; /* Ensure structure on small screens */
-  
-  th, td { 
-    text-align: left; 
-    padding: 12px; 
-    border-bottom: 1px solid rgba(255,255,255,0.05); 
+  min-width: 600px;
+  /* Ensure structure on small screens */
+
+  th,
+  td {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     vertical-align: top;
   }
-  th { color: var(--text-tertiary); font-weight: 600; background: rgba(255,255,255,0.02); }
-  td { color: var(--text-secondary); }
-  
-  .severity-critical { color: var(--status-error); font-weight: 700; }
-  .severity-high { color: #fca5a5; }
-  .status-pill { 
-    background: rgba(255,255,255,0.1); 
-    padding: 2px 6px; 
-    border-radius: 4px; 
-    font-size: 0.75rem; 
+
+  th {
+    color: var(--text-tertiary);
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  td {
+    color: var(--text-secondary);
+  }
+
+  .severity-critical {
+    color: var(--status-error);
+    font-weight: 700;
+  }
+
+  .severity-high {
+    color: #fca5a5;
+  }
+
+  .status-pill {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.75rem;
   }
 }
 
 /* TRANSITIONS */
-.crossfade-enter-active, .crossfade-leave-active { transition: opacity 2s ease; }
-.crossfade-enter-from, .crossfade-leave-to { opacity: 0; }
-.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.crossfade-enter-active,
+.crossfade-leave-active {
+  transition: opacity 2s ease;
+}
+
+.crossfade-enter-from,
+.crossfade-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>

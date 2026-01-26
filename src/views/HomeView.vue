@@ -319,7 +319,7 @@ const projects = [
   position: relative;
   z-index: 10;
   margin-top: -3rem;
-  @include respond-to('mobile') { margin-top: 0; }
+  @include respond-to('mobile') { margin-top: 2rem; }
 }
 
 .section-title {
@@ -443,6 +443,11 @@ const projects = [
     align-items: center;
     justify-content: center;
     gap: var(--space-sm);
+    @include respond-to('mobile') {
+      flex-direction: column;
+      
+    
+    }
   }
   
   .spec-icon { color: var(--text-tertiary); }

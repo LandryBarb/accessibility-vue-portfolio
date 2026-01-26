@@ -197,6 +197,10 @@ const navItems = [
       color: var(--brand-primary);
       /* Use a top indicator line for active state on mobile */
       border-top: 2px solid var(--brand-primary); 
+      .nav-icon{
+        margin-block-start: 0.5em;
+      }
+
     }
   }
 }
