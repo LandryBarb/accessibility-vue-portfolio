@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { Home, Search, Folder, MonitorPlay, Settings, User, Share2, X } from 'lucide-vue-next';
+import { Home, Search, Folder, MonitorPlay, Settings, User, Share2, X, Globe } from 'lucide-vue-next';
 
 // Profile Modal State
 const isProfileOpen = ref(false);
@@ -9,6 +9,7 @@ const navItems = [
   { name: 'Home', path: '/', icon: Home },
   { name: 'Search Work', path: '/search', icon: Search },
   { name: 'Portfolio', path: '/portfolio', icon: Folder },
+  { name: 'Websites', path: '/websites', icon: Globe },
   { name: 'Case Studies', path: '/case-studies', icon: MonitorPlay },
   { name: 'About', path: '/about', icon: User }
 ];

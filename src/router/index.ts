@@ -9,6 +9,8 @@ import AboutView from "../views/AboutView.vue";
 import SettingsView from "../views/SettingsView.vue";
 import SearchView from "../views/SearchView.vue";
 import NotFoundView from '../views/NotFoundView.vue'
+import WebsitesView from "../views/WebsitesView.vue";
+import WebsiteDetailView from "../views/WebsiteDetailView.vue";
 
 // Define application routes. Each route maps a path to a component.
 const routes = [
@@ -37,6 +39,19 @@ const routes = [
       props: true,
       meta: { title: 'Component Detail' }
     },
+    {
+    path: '/websites',
+    name: 'websites',
+    component: WebsitesView,
+    meta: { title: 'Websites' }
+  },
+  {
+    path: '/websites/:id', // NEW DYNAMIC ROUTE
+    name: 'website-detail',
+    component: WebsiteDetailView,
+    props: true,
+    meta: { title: 'Project Details' }
+  },
 
   {
     path: '/case-studies/:id',
