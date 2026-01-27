@@ -1,10 +1,10 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { 
   Play, Info, CheckCircle2, AlertTriangle, 
-  Monitor, Award, CodeXml 
+  Monitor, Award, CodeXml, Globe, ArrowRight 
 } from 'lucide-vue-next';
-
+import { webProjects } from '../data/webProjects';
 
 
 // --- Assets ---
@@ -30,11 +30,14 @@ onBeforeUnmount(() => {
   if (timer) clearTimeout(timer);
 });
 
+const recentWebsites = computed(() => webProjects.slice(0, 3));
 // --- Static Content ---
 const featured = {
   title: "Human-Centered Accessibility for Entertainment Platforms",
   subtitle: "I design and build accessible frontend systems for streaming experiences focused on real users, compliance, and scale.",
 };
+
+
 
 // --- Projects / Experiments Data ---
 // We only display the data points relevant to the "Poster" view
@@ -159,6 +162,48 @@ const projects = [
               
               <div class="poster-tags">
                 <span v-for="tag in project.tags" :key="tag" class="tag">{{ tag }}</span>
+              </div>
+            </div>
+
+          </router-link>
+        </article>
+      </div>
+    </section>
+
+    <section class="content-wrapper section-websites" aria-labelledby="websites-heading">
+      <div class="section-header">
+        <h2 id="websites-heading" class="section-title">Recent Websites</h2>
+        <router-link to="/websites" class="link-more">View All <ArrowRight size="16" /></router-link>
+      </div>
+
+      <div class="grid-posters">
+        <article v-for="site in recentWebsites" :key="site.id" class="poster-card">
+          <router-link :to="`/websites/${site.id}`" class="poster-link">
+            
+            <div class="poster-image" :class="site.imageClass">
+              <img 
+                v-if="site.thumbnail" 
+                :src="site.thumbnail" 
+                :alt="`Thumbnail for ${site.title}`"
+                class="img-cover" 
+                loading="lazy"
+              />
+              
+              <div class="poster-overlay">
+                <div class="play-circle"><Globe /></div>
+              </div>
+            </div>
+
+            <div class="poster-info">
+              <h3 class="poster-title">{{ site.title }}</h3>
+              
+              <div class="poster-meta">
+                <span class="match-score">{{ site.compliance }}</span>
+                <span class="genre">{{ site.category }}</span>
+              </div>
+              
+              <div class="poster-tags">
+                <span v-for="tag in site.tags" :key="tag" class="tag">{{ tag }}</span>
               </div>
             </div>
 
@@ -322,10 +367,36 @@ const projects = [
   @include respond-to('mobile') { margin-top: 2rem; }
 }
 
+.section-websites {
+  margin-top: var(--space-2xl);
+}
+
 .section-title {
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: var(--space-md);
+}
+
+.link-more {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-tertiary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+  
+  &:hover { color: var(--brand-primary); }
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: var(--space-sm);
 }
 
 .grid-posters {
@@ -366,6 +437,16 @@ const projects = [
   &.poster-purple { background: linear-gradient(135deg, #581c87, #000); }
   &.poster-emerald { background: linear-gradient(135deg, #064e3b, #000); }
   &.poster-orange { background: linear-gradient(135deg, #7c2d12, #000); }
+}
+
+.img-cover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1; /* Below overlay */
 }
 
 .poster-overlay {
