@@ -16,6 +16,7 @@ thumbnail?: string;      // path to thumbnail image
   liveLink?: string;         // URL to the live site
   figmaLink?: string;       // optional Figma prototype link
   repoLink?: string;        // optional code repository
+  websiteAddress?: string; // optional website address for display
 }
 
 export const webProjects: WebProject[] = [
@@ -29,10 +30,11 @@ export const webProjects: WebProject[] = [
       "Responsive redesign of a voice actor's website with accessible controls and clear hierarchy.",
     imageClass: "poster-emerald",
     tags: ["Responsive", "Figma", "Semantic HTML"],
-    thumbnail: "/images/webProjects/voice-actor-hero.webp",
-    heroImage: "/images/webProjects/voice-actor-hero.webp",
-    homepageImage: "/images/webProjects/voice-actor-home.webp",
+    thumbnail: "/images/webProjects/voice-actor-hero.png",
+    heroImage: "/images/webProjects/voice-actor-hero.png",
+    homepageImage: "/images/webProjects/voice-actor-home.png",
    liveLink: "https://marksilvermanvoice.com/",
+   websiteAddress: "marksilvermanvoice.com",
     figmaLink: "https://www.figma.com/design/kbORIYp7VxURzQnT7pJ35l/Mark-Silverman-Voice-Actor?node-id=8447-12&t=1hQfbZsJJi6Qh9IA-1"
   },
  {
@@ -44,9 +46,10 @@ export const webProjects: WebProject[] = [
     desc: "A modern, accessible website design for an actor's portfolio, focusing on visual storytelling and ease of navigation.",
     imageClass: "poster-purple",
     tags: ["Landing Page", "Dark Mode", "Performance"],
-    thumbnail: "/images/webProjects/actor-hero.webp",
-    heroImage: "/images/webProjects/actor-hero.webp",
-    homepageImage: "/images/webProjects/actor-full.webp",
+    thumbnail: "/images/webProjects/actor-hero.png",
+    heroImage: "/images/webProjects/actor-hero.png",
+    homepageImage: "/images/webProjects/actor-full.png",
+    websiteAddress: "actor-portfolio.com",
     // No liveLink provided -> Triggers Detail View
     figmaLink: "https://www.figma.com/design/lbYxrVaSOZXTqgNXCMT79s/Actor-Template?node-id=2185-168&t=EgnDp1v7U9IicaKe-1"
   },
@@ -59,9 +62,10 @@ export const webProjects: WebProject[] = [
     desc: "A sleek, futuristic website design for a VR production studio, emphasizing immersive visuals and user engagement.",
     imageClass: "poster-pink",
     tags: ["Figma", "Dark Mode", "Visual Design"],
-    thumbnail: "/images/webProjects/vrStudio-hero.webp",
-    heroImage: "/images/webProjects/vrStudio-hero.webp",
-    homepageImage: "/images/webProjects/vrStudio-full.webp",
+    thumbnail: "/images/webProjects/vrStudio-hero.png",
+    heroImage: "/images/webProjects/vrStudio-hero.png",
+    homepageImage: "/images/webProjects/vrStudio-full.png",
+    websiteAddress: "opus-vfx.com",
     figmaLink: "https://www.figma.com/design/OaP8dkLH8T7vD0TLoeZ3Xl/Opus-VFX-Webflow-Website?node-id=6383-168&t=Y07yYtEFNku9XOb1-1 "
   },
 ];

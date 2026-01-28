@@ -1,15 +1,15 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
-import { 
-  Play, Info, CheckCircle2, AlertTriangle, 
-  Monitor, Award, CodeXml, Globe, ArrowRight 
+import {
+  Play, Info, CheckCircle2, AlertTriangle,
+  Monitor, Award, CodeXml, Globe, ArrowRight
 } from 'lucide-vue-next';
 import { webProjects } from '../data/webProjects';
 
 
 // --- Assets ---
 // Placeholders - replace with your actual assets
-const FEATURED_IMAGE = './images/hero.png'; 
+const FEATURED_IMAGE = './images/hero.png';
 const FEATURED_VIDEO = './videos/hero.mp4';
 // --- State ---
 const showVideo = ref(false);
@@ -33,8 +33,8 @@ onBeforeUnmount(() => {
 const recentWebsites = computed(() => webProjects.slice(0, 3));
 // --- Static Content ---
 const featured = {
-  title: "Human-Centered Accessibility for Entertainment Platforms",
-  subtitle: "I design and build accessible frontend systems for streaming experiences focused on real users, compliance, and scale.",
+  title: "Accessible Frontend Systems for Streaming Platforms",
+  subtitle: "I design and build accessible UI components and flows for entertainment products, with a focus on real user tasks, WCAG compliance, and production scale.",
 };
 
 
@@ -84,39 +84,29 @@ const projects = [
 
 <template>
   <div class="page-container">
-    
+
     <header class="hero" role="banner">
       <div class="hero__bg" aria-hidden="true">
-        <div 
-          class="bg-layer bg-image"
-          :style="{ backgroundImage: `url(${FEATURED_IMAGE})` }"
-        ></div>
-        
+        <div class="bg-layer bg-image" :style="{ backgroundImage: `url(${FEATURED_IMAGE})` }"></div>
+
         <transition name="crossfade">
           <div v-if="showVideo" class="bg-layer bg-video-wrapper">
-             <video 
-               class="bg-video" 
-               autoplay 
-               muted 
-               loop 
-               playsinline
-               disablePictureInPicture
-             >
-               <source :src="FEATURED_VIDEO" type="video/mp4">
-             </video>
+            <video class="bg-video" autoplay muted loop playsinline disablePictureInPicture>
+              <source :src="FEATURED_VIDEO" type="video/mp4">
+            </video>
           </div>
         </transition>
-        
+
         <div class="bg-layer bg-vignette"></div>
       </div>
 
       <div class="content-wrapper hero__content">
         <div class="meta-row">
-          <span class="meta-badge badge--new">Accessible Technologist</span>
+          <span class="meta-badge badge--new">Frontend Accessibility Engineer</span>
           <span class="meta-text">2026</span>
-          <span class="meta-box">CC</span>
-          <span class="meta-box">ADA</span>
-          <span class="meta-box">AAA</span>
+          <span class="meta-box">WCAG 2.2</span>
+          <span class="meta-box">AA</span>
+          <span class="meta-box">Keyboard + SR</span>
         </div>
 
         <h1 class="hero__title">{{ featured.title }}</h1>
@@ -127,10 +117,10 @@ const projects = [
             <Play class="btn-icon" fill="currentColor" />
             <span>Featured Case Study</span>
           </router-link>
-          
-          <router-link to="/about" class="btn btn--secondary">
+
+          <router-link to="/websites/201" class="btn btn--secondary">
             <Info class="btn-icon" />
-            <span>More Info</span>
+            <span>Featured Website</span>
           </router-link>
         </div>
       </div>
@@ -138,28 +128,30 @@ const projects = [
 
     <section class="content-wrapper section-trending" aria-labelledby="trending-heading">
       <h2 id="trending-heading" class="section-title">Trending Now</h2>
-      
+
       <div class="grid-posters">
         <article v-for="project in projects" :key="project.id" class="poster-card">
           <router-link :to="`/experiments/${project.id}`" class="poster-link">
-            
+
             <div class="poster-image" :class="project.imageClass">
               <div class="poster-overlay">
-                <div class="play-circle"><Play fill="currentColor" /></div>
+                <div class="play-circle">
+                  <Play fill="currentColor" />
+                </div>
               </div>
             </div>
 
             <div class="poster-info">
               <h3 class="poster-title">{{ project.title }}</h3>
-              
+
               <div class="poster-meta">
                 <span class="match-score">{{ project.compliance }}</span>
-                
+
                 <span class="genre">{{ project.category }}</span>
-                
+
                 <span class="hd-badge">{{ project.stack }}</span>
               </div>
-              
+
               <div class="poster-tags">
                 <span v-for="tag in project.tags" :key="tag" class="tag">{{ tag }}</span>
               </div>
@@ -173,35 +165,34 @@ const projects = [
     <section class="content-wrapper section-websites" aria-labelledby="websites-heading">
       <div class="section-header">
         <h2 id="websites-heading" class="section-title">Recent Websites</h2>
-        <router-link to="/websites" class="link-more">View All <ArrowRight size="16" /></router-link>
+        <router-link to="/websites" class="link-more">View All
+          <ArrowRight size="16" />
+        </router-link>
       </div>
 
       <div class="grid-posters">
         <article v-for="site in recentWebsites" :key="site.id" class="poster-card">
           <router-link :to="`/websites/${site.id}`" class="poster-link">
-            
+
             <div class="poster-image" :class="site.imageClass">
-              <img 
-                v-if="site.thumbnail" 
-                :src="site.thumbnail" 
-                :alt="`Thumbnail for ${site.title}`"
-                class="img-cover" 
-                loading="lazy"
-              />
-              
+              <img v-if="site.thumbnail" :src="site.thumbnail" :alt="`Thumbnail for ${site.title}`" class="img-cover"
+                loading="lazy" />
+
               <div class="poster-overlay">
-                <div class="play-circle"><Globe /></div>
+                <div class="play-circle">
+                  <Globe />
+                </div>
               </div>
             </div>
 
             <div class="poster-info">
               <h3 class="poster-title">{{ site.title }}</h3>
-              
+
               <div class="poster-meta">
                 <span class="match-score">{{ site.compliance }}</span>
                 <span class="genre">{{ site.category }}</span>
               </div>
-              
+
               <div class="poster-tags">
                 <span v-for="tag in site.tags" :key="tag" class="tag">{{ tag }}</span>
               </div>
@@ -212,26 +203,26 @@ const projects = [
       </div>
     </section>
 
-<footer class="content-wrapper section-specs">
-  <ul class="specs-grid" role="list">
-    <li class="spec">
-      <Monitor class="spec-icon" aria-hidden="true" />
-      <span><strong>Accessibility-First</strong> Frontend</span>
-    </li>
-    <li class="spec">
-      <CheckCircle2 class="spec-icon" aria-hidden="true" />
-      <span><strong>WCAG 2.2</strong> AA</span>
-    </li>
-    <li class="spec">
-      <AlertTriangle class="spec-icon" aria-hidden="true" />
-      <span><strong>Compliance & Risk</strong> Reduction</span>
-    </li>
-    <li class="spec">
-      <CodeXml class="spec-icon" aria-hidden="true" />
-      <span><strong>Vue + Semantic</strong> Components</span>
-    </li>
-  </ul>
-</footer>
+    <footer class="content-wrapper section-specs">
+      <ul class="specs-grid" role="list">
+        <li class="spec">
+          <Monitor class="spec-icon" aria-hidden="true" />
+          <span><strong>Accessibility-First</strong> Frontend</span>
+        </li>
+        <li class="spec">
+          <CheckCircle2 class="spec-icon" aria-hidden="true" />
+          <span><strong>WCAG 2.2</strong> AA</span>
+        </li>
+        <li class="spec">
+          <AlertTriangle class="spec-icon" aria-hidden="true" />
+          <span><strong>Compliance & Risk</strong> Reduction</span>
+        </li>
+        <li class="spec">
+          <CodeXml class="spec-icon" aria-hidden="true" />
+          <span><strong>Vue + Semantic</strong> Components</span>
+        </li>
+      </ul>
+    </footer>
 
   </div>
 </template>
@@ -242,6 +233,7 @@ const projects = [
 /* CUBE: Composition Layer */
 .page-container {
   padding-bottom: var(--space-2xl);
+
   @include respond-to('laptop') {
     padding-bottom: calc(var(--mobile-nav-height) + var(--space-lg));
   }
@@ -255,13 +247,16 @@ const projects = [
   align-items: center;
   overflow: hidden;
   isolation: isolate;
-  @include respond-to('mobile') { min-height: 60vh; }
+
+  @include respond-to('mobile') {
+    min-height: 60vh;
+  }
 
   &__bg {
     position: absolute;
     inset: 0;
     background-color: var(--bg-body);
-    z-index:-1;
+    z-index: -1;
   }
 
   &__content {
@@ -302,7 +297,7 @@ const projects = [
 .bg-image {
   background-size: cover;
   background-position: center top;
-  background-color: #0f172a; 
+  background-color: #0f172a;
 }
 
 .bg-video-wrapper {
@@ -319,14 +314,15 @@ const projects = [
 .bg-vignette {
   z-index: 2;
   background: radial-gradient(circle at 75% 25%, rgba(30, 64, 175, 0.2) 0%, transparent 50%),
-              linear-gradient(to top, var(--bg-body) 5%, rgba(5, 5, 5, 0.6) 25%, transparent 100%),
-              linear-gradient(to right, rgba(5, 5, 5, 0.8) 0%, transparent 60%);
+    linear-gradient(to top, var(--bg-body) 5%, rgba(5, 5, 5, 0.6) 25%, transparent 100%),
+    linear-gradient(to right, rgba(5, 5, 5, 0.8) 0%, transparent 60%);
 }
 
 .crossfade-enter-active,
 .crossfade-leave-active {
   transition: opacity 2s ease-in-out;
 }
+
 .crossfade-enter-from,
 .crossfade-leave-to {
   opacity: 0;
@@ -364,7 +360,10 @@ const projects = [
   position: relative;
   z-index: 10;
   margin-top: -3rem;
-  @include respond-to('mobile') { margin-top: 2rem; }
+
+  @include respond-to('mobile') {
+    margin-top: 2rem;
+  }
 }
 
 .section-websites {
@@ -386,8 +385,10 @@ const projects = [
   font-weight: 600;
   text-decoration: none;
   transition: color 0.2s;
-  
-  &:hover { color: var(--brand-primary); }
+
+  &:hover {
+    color: var(--brand-primary);
+  }
 }
 
 .section-header {
@@ -395,7 +396,7 @@ const projects = [
   align-items: baseline;
   justify-content: space-between;
   margin-bottom: var(--space-md);
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding-bottom: var(--space-sm);
 }
 
@@ -403,7 +404,10 @@ const projects = [
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: var(--space-md);
-  @include respond-to('mobile') { grid-template-columns: 1fr; }
+
+  @include respond-to('mobile') {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* BLOCK: Poster Card */
@@ -412,13 +416,18 @@ const projects = [
     display: block;
     text-decoration: none;
     color: inherit;
-    &:hover, &:focus-visible {
+
+    &:hover,
+    &:focus-visible {
       .poster-image {
         transform: scale(1.05);
         border-color: white;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       }
-      .poster-overlay { opacity: 1; }
+
+      .poster-overlay {
+        opacity: 1;
+      }
     }
   }
 }
@@ -433,10 +442,21 @@ const projects = [
   transition: all 0.3s var(--ease-cinematic);
   margin-bottom: var(--space-xs);
 
-  &.poster-blue { background: linear-gradient(135deg, #1e3a8a, #000); }
-  &.poster-purple { background: linear-gradient(135deg, #581c87, #000); }
-  &.poster-emerald { background: linear-gradient(135deg, #064e3b, #000); }
-  &.poster-orange { background: linear-gradient(135deg, #7c2d12, #000); }
+  &.poster-blue {
+    background: linear-gradient(135deg, #1e3a8a, #000);
+  }
+
+  &.poster-purple {
+    background: linear-gradient(135deg, #581c87, #000);
+  }
+
+  &.poster-emerald {
+    background: linear-gradient(135deg, #064e3b, #000);
+  }
+
+  &.poster-orange {
+    background: linear-gradient(135deg, #7c2d12, #000);
+  }
 }
 
 .img-cover {
@@ -446,25 +466,26 @@ const projects = [
   width: 100%;
   height: 100%;
   object-fit: cover;
-  z-index: 1; /* Below overlay */
+  z-index: 1;
+  /* Below overlay */
 }
 
 .poster-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
   transition: opacity 0.3s ease;
-  
+
   .play-circle {
     width: 3rem;
     height: 3rem;
     border-radius: 50%;
     border: 2px solid white;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.6);
     color: white;
     display: flex;
     align-items: center;
@@ -489,19 +510,39 @@ const projects = [
   font-size: 0.75rem;
   margin-bottom: 6px;
 
-  .match-score { color: var(--status-success); font-weight: 700; }
-  .genre { color: var(--text-secondary); }
-  .hd-badge { border: 1px solid var(--text-tertiary); padding: 0 2px; border-radius: 2px; font-size: 0.65rem; }
+  .match-score {
+    color: var(--status-success);
+    font-weight: 700;
+  }
+
+  .genre {
+    color: var(--text-secondary);
+  }
+
+  .hd-badge {
+    border: 1px solid var(--text-tertiary);
+    padding: 0 2px;
+    border-radius: 2px;
+    font-size: 0.65rem;
+  }
 }
 
 .poster-tags {
   display: flex;
   gap: 8px;
+
   .tag {
     font-size: 0.75rem;
     color: var(--text-tertiary);
-    &::after { content: "•"; margin-left: 8px; }
-    &:last-child::after { content: ""; }
+
+    &::after {
+      content: "•";
+      margin-left: 8px;
+    }
+
+    &:last-child::after {
+      content: "";
+    }
   }
 }
 
@@ -509,7 +550,7 @@ const projects = [
 .section-specs {
   margin-top: var(--space-2xl);
   padding-top: var(--space-lg);
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .specs-grid {
@@ -518,20 +559,26 @@ const projects = [
   gap: var(--space-lg);
   color: var(--text-secondary);
   text-align: center;
-  
+
   .spec {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-sm);
+
     @include respond-to('mobile') {
       flex-direction: column;
-      
-    
+
+
     }
   }
-  
-  .spec-icon { color: var(--text-tertiary); }
-  .text-warning { color: var(--status-warning); }
+
+  .spec-icon {
+    color: var(--text-tertiary);
+  }
+
+  .text-warning {
+    color: var(--status-warning);
+  }
 }
 </style>

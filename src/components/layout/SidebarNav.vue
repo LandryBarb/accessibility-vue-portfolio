@@ -27,16 +27,12 @@ const navItems = [
 
     <ul class="nav-list">
       <li v-for="item in navItems" :key="item.name" class="nav-item">
-        <router-link 
-          :to="item.path" 
-          class="nav-link"
-          active-class="is-active"
-        >
+        <router-link :to="item.path" class="nav-link" active-class="is-active">
           <component :is="item.icon" class="nav-icon" aria-hidden="true" />
           <span class="nav-label">{{ item.name }}</span>
         </router-link>
       </li>
-      
+
       <!-- <li class="nav-item mobile-only">
         <router-link to="/about" class="nav-link" active-class="is-active">
           <User class="nav-icon" aria-hidden="true" />
@@ -50,12 +46,8 @@ const navItems = [
         <Settings class="nav-icon" aria-hidden="true" />
         Settings
       </router-link>
-      
-      <button 
-        class="profile-btn" 
-        @click="isProfileOpen = true"
-        aria-label="View Profile Stats"
-      >
+
+      <button class="profile-btn" @click="isProfileOpen = true" aria-label="View Profile Stats">
         <div class="profile-avatar">AE</div>
         <div class="profile-meta">
           <span class="name">Access. Eng.</span>
@@ -75,9 +67,18 @@ const navItems = [
               </button>
             </div>
             <dl class="stats-grid">
-              <div class="stat"><dt>Accessibility</dt><dd>WCAG 2.2, ADA</dd></div>
-              <div class="stat"><dt>Focus</dt><dd>Streaming Platforms</dd></div>
-              <div class="stat"><dt>Build</dt><dd>Human-First</dd></div>
+              <div class="stat">
+                <dt>Standards</dt>
+                <dd>WCAG 2.2 AA</dd>
+              </div>
+              <div class="stat">
+                <dt>Focus</dt>
+                <dd>Streaming UI Systems</dd>
+              </div>
+              <div class="stat">
+                <dt>Build</dt>
+                <dd>Keyboard & Screen Reader</dd>
+              </div>
             </dl>
           </div>
         </div>
@@ -97,7 +98,7 @@ const navItems = [
   height: 100vh;
   width: var(--sidebar-width);
   background-color: black;
-  border-right: 1px solid rgba(255,255,255,0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   padding: var(--space-lg);
@@ -108,11 +109,12 @@ const navItems = [
     top: auto;
     bottom: 0;
     width: 100%;
-    height: var(--mobile-nav-height); /* ~64px */
+    height: var(--mobile-nav-height);
+    /* ~64px */
     flex-direction: row;
     padding: 0;
     border-right: none;
-    border-top: 1px solid rgba(255,255,255,0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     background-color: var(--bg-glass);
     backdrop-filter: blur(12px);
     justify-content: space-between;
@@ -126,10 +128,15 @@ const navItems = [
   gap: var(--space-xs);
   margin-bottom: var(--space-xl);
   color: var(--brand-primary);
-  
-  .brand-text { font-weight: 800; color: white; }
 
-  @include respond-to('laptop') { display: none; }
+  .brand-text {
+    font-weight: 800;
+    color: white;
+  }
+
+  @include respond-to('laptop') {
+    display: none;
+  }
 }
 
 /* --- Navigation List --- */
@@ -150,7 +157,9 @@ const navItems = [
 }
 
 .nav-item {
-  @include respond-to('laptop') { flex: 1; }
+  @include respond-to('laptop') {
+    flex: 1;
+  }
 }
 
 /* --- Links --- */
@@ -167,9 +176,10 @@ const navItems = [
   border: 1px solid transparent;
 
   /* Desktop Hover/Active */
-  &:hover, &:focus-visible {
+  &:hover,
+  &:focus-visible {
     color: white;
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255, 255, 255, 0.1);
   }
 
   &.is-active {
@@ -187,18 +197,27 @@ const navItems = [
     padding: 0;
     height: 100%;
     border-radius: 0;
-    background-color: transparent !important; /* Remove background on mobile */
+    background-color: transparent !important;
+    /* Remove background on mobile */
     box-shadow: none !important;
     border: none;
 
-    .nav-label { font-size: 0.65rem; font-weight: 600; }
-    .nav-icon { width: 1.25rem; height: 1.25rem; }
+    .nav-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+    }
+
+    .nav-icon {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
 
     &.is-active {
       color: var(--brand-primary);
       /* Use a top indicator line for active state on mobile */
-      border-top: 2px solid var(--brand-primary); 
-      .nav-icon{
+      border-top: 2px solid var(--brand-primary);
+
+      .nav-icon {
         margin-block-start: 0.5em;
       }
 
@@ -207,13 +226,24 @@ const navItems = [
 }
 
 /* --- Utilities --- */
-.desktop-only { @include respond-to('laptop') { display: none !important; } }
-.mobile-only { display: none; @include respond-to('laptop') { display: block; } }
+.desktop-only {
+  @include respond-to('laptop') {
+    display: none !important;
+  }
+}
+
+.mobile-only {
+  display: none;
+
+  @include respond-to('laptop') {
+    display: block;
+  }
+}
 
 /* --- Desktop Footer Profile --- */
 .nav-footer {
   margin-top: auto;
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: var(--space-md);
   display: flex;
   flex-direction: column;
@@ -233,7 +263,9 @@ const navItems = [
   text-align: left;
   color: white;
 
-  &:hover { background: rgba(255,255,255,0.05); }
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
 }
 
 .profile-avatar {
@@ -250,15 +282,23 @@ const navItems = [
 .profile-meta {
   display: flex;
   flex-direction: column;
-  .name { font-size: 0.85rem; font-weight: 600; }
-  .status { font-size: 0.7rem; color: var(--status-success); }
+
+  .name {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .status {
+    font-size: 0.7rem;
+    color: var(--status-success);
+  }
 }
 
 /* --- Modal Styles (Global because of Teleport) --- */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(4px);
   z-index: var(--z-modal);
   display: flex;
@@ -270,7 +310,7 @@ const navItems = [
   background: var(--bg-surface);
   padding: var(--space-lg);
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   width: 90%;
   max-width: 320px;
 }
@@ -279,7 +319,10 @@ const navItems = [
   display: flex;
   justify-content: space-between;
   margin-bottom: var(--space-md);
-  h3 { font-size: 1.1rem; }
+
+  h3 {
+    font-size: 1.1rem;
+  }
 }
 
 .close-btn {
@@ -287,19 +330,36 @@ const navItems = [
   border: none;
   color: var(--text-tertiary);
   cursor: pointer;
-  &:hover { color: white; }
+
+  &:hover {
+    color: white;
+  }
 }
 
 .stats-grid .stat {
   display: flex;
   justify-content: space-between;
   padding: var(--space-xs) 0;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  dt { color: var(--text-tertiary); }
-  dd { font-family: var(--font-mono); font-weight: 700; }
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  dt {
+    color: var(--text-tertiary);
+  }
+
+  dd {
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
 }
 
 /* Transition */
-.fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>

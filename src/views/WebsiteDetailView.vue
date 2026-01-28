@@ -59,7 +59,7 @@ const project = computed(() => {
             <div class="dots">
               <span></span><span></span><span></span>
             </div>
-            <div class="address-bar">https://{{ project.title.toLowerCase().replace(/\s+/g, '-') }}.com</div>
+            <div class="address-bar">https://{{ project.websiteAddress.toLowerCase().replace(/\s+/g, '-') }}</div>
           </div>
           
           <div class="scroll-container">
