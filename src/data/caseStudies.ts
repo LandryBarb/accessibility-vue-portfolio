@@ -137,14 +137,14 @@ export const caseStudies: CaseStudy[] = [
 
   media: {
     heroImage: "/images/thumbnails/caseStudy_1_vertical.png",
-    heroVideo: "/videos/caseStudy_1_video.mp4",
+    heroVideo: "/videos/caseStudy_1_remediation.mp4",
 
     // Before State
-    auditScreenshot: "/images/audits/caseStudy_1_audit.png",
-    auditVideo: "/videos/caseStudy_1_video.mp4",
+    // auditScreenshot: "/images/audits/caseStudy_1_audit.png",
+    // auditVideo: "/videos/caseStudy_1_audit.mp4",
 
     // After State
-    // remediationScreenshot: "/images/remediations/caseStudy_1_remediation.png",
+    remediationScreenshot: "/images/remediations/caseStudy_1_remediation.png",
     remediationVideo: "/videos/caseStudy_1_remediation.mp4"
   },
 

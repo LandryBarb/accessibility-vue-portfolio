@@ -251,8 +251,8 @@ watch(() => route.params.id, () => {
             Evidence & Remediation
           </h2>
           <div class="evidence-grid">
-            <div class="evidence-col">
-              <h3 class="evidence-label text-error">
+            <div v-if="project.media.auditScreenshot || project.media.auditVideo" class="evidence-col">
+              <h3  class="evidence-label text-error">
                 <AlertTriangle size="16" /> Before: Audit Findings
               </h3>
               <figure class="media-container">

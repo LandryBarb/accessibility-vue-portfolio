@@ -320,7 +320,7 @@ onBeforeUnmount(() => {
   background: black; 
 }
 
-.poster-video { width: 100%; height: 100%; object-fit: cover; }
+.poster-video { width: 100%; height: 100%; object-fit: contain; }
 
 .poster-badge {
   position: absolute; top: 8px; left: 8px;

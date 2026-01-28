@@ -60,7 +60,7 @@ export const webProjects: WebProject[] = [
     stack: "Figma",
     compliance: "In progress: WCAG 2.1 AA",
     desc: "A sleek, futuristic website design for a VR production studio, emphasizing immersive visuals and user engagement.",
-    imageClass: "poster-pink",
+    imageClass: "poster-zinc",
     tags: ["Figma", "Dark Mode", "Visual Design"],
     thumbnail: "/images/webProjects/vrStudio-hero.png",
     heroImage: "/images/webProjects/vrStudio-hero.png",

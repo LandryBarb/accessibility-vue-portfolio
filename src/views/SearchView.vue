@@ -5,6 +5,7 @@ import {
 } from 'lucide-vue-next';
 import { caseStudies } from '../data/caseStudies';
 import { experiments } from '../data/experiments';
+import { webProjects } from '../data/webProjects';
 
 // --- State ---
 const searchQuery = ref('');
@@ -15,6 +16,7 @@ const searchInput = ref(null);
 const categories = [
   { id: 'All', label: 'All' },
   { id: 'Case Study', label: 'Case Studies' },
+  { id: 'Website', label: 'Websites' },
   { id: 'Component', label: 'Components' },
   { id: 'Audit', label: 'Audits' },
   { id: 'System Design', label: 'Systems' },
@@ -23,21 +25,39 @@ const categories = [
 
 // --- Data Normalization ---
 const allContent = computed(() => {
+  // Normalize Experiments
   const normExperiments = experiments.map(exp => ({
     ...exp,
     genre: exp.category, 
     tagline: exp.desc,
     imageClass: exp.imageClass || 'poster-slate',
     match: '100%', 
-    type: 'experiment'
+    type: 'experiment',
+    // Pre-calculate route for cleaner template
+    routePath: `/experiments/${exp.id}` 
   }));
 
+  // Normalize Case Studies
   const normCaseStudies = caseStudies.map(cs => ({
     ...cs,
-    type: 'casestudy'
+    genre: 'Case Study', // Ensure consistent genre for filtering
+    type: 'casestudy',
+    routePath: `/case-studies/${cs.id}`
   }));
 
-  return [...normCaseStudies, ...normExperiments];
+  // 3. Normalize Websites (NEW)
+  const normWebsites = webProjects.map(site => ({
+    ...site,
+    genre: 'Website',
+    tagline: site.desc,
+    // Use existing imageClass or default
+    imageClass: site.imageClass || 'poster-emerald', 
+    match: '100%',
+    type: 'website',
+    routePath: `/websites/${site.id}`
+  }));
+
+  return [...normCaseStudies, ...normWebsites, ...normExperiments];
 });
 
 // --- Filtering Logic ---
