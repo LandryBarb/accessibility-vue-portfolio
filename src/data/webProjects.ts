@@ -4,7 +4,7 @@
 export interface WebProject {
   id: number;
   title: string;
-  category: "Website";      // used for filtering
+  category: string;      // used for filtering
   stack: string;            // e.g. "Vue 3 / Nuxt"
   compliance: string;       // if relevant
   desc: string;             // short description of the project
@@ -40,7 +40,7 @@ export const webProjects: WebProject[] = [
  {
     id: 202,
     title: "Actor Website Design",
-    category: "Website",
+    category: "Web Design",
     stack: "Figma",
     compliance: "In progress: WCAG 2.1 AA",
     desc: "A modern, accessible website design for an actor's portfolio, focusing on visual storytelling and ease of navigation.",
@@ -56,7 +56,7 @@ export const webProjects: WebProject[] = [
   {
     id: 203,
     title: "VR Production Studio Website",
-    category: "Website",
+    category: "Web Design",
     stack: "Figma",
     compliance: "In progress: WCAG 2.1 AA",
     desc: "A sleek, futuristic website design for a VR production studio, emphasizing immersive visuals and user engagement.",
@@ -67,5 +67,21 @@ export const webProjects: WebProject[] = [
     homepageImage: "/images/webProjects/vrStudio-full.png",
     websiteAddress: "opus-vfx.com",
     figmaLink: "https://www.figma.com/design/OaP8dkLH8T7vD0TLoeZ3Xl/Opus-VFX-Webflow-Website?node-id=6383-168&t=Y07yYtEFNku9XOb1-1 "
+  },
+  {
+    id: 204,
+    title: "Law Enforcement Agency Website",
+    category: "Web Design",
+    stack: "Webflow / Figma",
+    compliance: "In progress: WCAG 2.0 A",
+    desc: "A sleek, futuristic website design for a law enforcement agency, emphasizing accessibility and clear communication.",
+    imageClass: "poster-zinc",
+    tags: ["Figma", "Dark Theme", "AI assisted Design"],
+    thumbnail: "/images/webProjects/law-enforcement-hero.png",
+    heroImage: "/images/webProjects/law-enforcement-hero.png",
+    homepageImage: "/images/webProjects/law-enforcement-full.png",
+    websiteAddress: "aztac-staging.webflow.io/",
+    liveLink: "https://aztac-staging.webflow.io/",
+    
   },
 ];
