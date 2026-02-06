@@ -30,7 +30,7 @@ onBeforeUnmount(() => {
   if (timer) clearTimeout(timer);
 });
 
-const recentWebsites = computed(() => webProjects.slice(0, 3));
+const recentWebsites = computed(() => webProjects.slice(0, 5));
 // --- Static Content ---
 const featured = {
   title: "Accessible Frontend Systems for Streaming Platforms",
@@ -56,7 +56,7 @@ const projects = [
     title: "Icon Button Atom",
     category: "Component",
     stack: "Vue 3 / TS",
-    compliance: "AAA",
+    compliance: "AA",
     imageClass: "poster-purple", // Choose: poster-blue, poster-purple, poster-emerald, poster-orange
     tags: ["Touch Target", "Focus", "Interactive"],
   },
@@ -65,7 +65,7 @@ const projects = [
     title: "Search Input",
     category: "Form",
     stack: "Vue 3 / Debounce",
-    compliance: "AAA",
+    compliance: "AA",
     imageClass: "poster-emerald",
     tags: ["Input", "Focus Mgmt", "Debounce"],
   },

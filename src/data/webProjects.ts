@@ -84,4 +84,22 @@ export const webProjects: WebProject[] = [
     liveLink: "https://aztac-staging.webflow.io/",
     
   },
+
+   {
+    id: 205,
+    title: "Dancer Website",
+    category: "Website",
+    stack: "HTML / Tailwind CSS / JavaScript",
+    compliance: "In progress: WCAG 2.0 A",
+    desc: "A sleek, captivating website design for a dancer or performer, emphasizing subtle  impactful design and clear communication.",
+    imageClass: "poster-orange",
+    tags: ["Figma", "Dark Theme", "AI assisted Design"],
+    thumbnail: "/images/webProjects/dancer-hero.png",
+    heroImage: "/images/webProjects/dancer-hero.png",
+    homepageImage: "/images/webProjects/dancer-full.png",
+
+    websiteAddress: "dancer-portfolio.com",
+    
+    
+  },
 ];
