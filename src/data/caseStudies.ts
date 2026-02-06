@@ -90,6 +90,12 @@ export interface AppendixSection {
   defectLog?: DefectLogItem[];
 }
 
+export interface ExecutiveSummary {
+  challenge: string;
+  solution: string;
+  result: string;
+}
+
 export interface CaseStudy {
   id: number;
   title: string;
@@ -105,6 +111,7 @@ export interface CaseStudy {
   timeline: string;
   stack: string;
   media: CaseStudyMedia;
+  executiveSummary: ExecutiveSummary;
   overview: string;
   barriers: AccessibilityBarrier[];
   constraints: string[];
@@ -147,6 +154,13 @@ export const caseStudies: CaseStudy[] = [
     remediationScreenshot: "/images/remediations/caseStudy_1_remediation.png",
     remediationVideo: "/videos/caseStudy_1_remediation.mp4"
   },
+
+  // NEW DATA
+    executiveSummary: {
+      challenge: "Primary navigation relied on clickable divs, blocking keyboard users and hiding menu structures from screen readers.",
+      solution: "Replaced with semantic header/nav landmarks, native buttons, and a standard ARIA menu pattern.",
+      result: "Achieved 100% keyboard operability, WCAG 2.2 AA compliance, and reliable screen reader announcements."
+    },
 
   overview:
     "Streaming platform top navigation frequently fails audits due to div-based click targets, missing landmarks, lack of bypass mechanisms, and inaccessible profile dropdown menus. This remediation rebuilt the top bar using semantic header/nav landmarks, a skip link, native interactive controls, and an accessible menu button pattern with predictable focus management.",
@@ -310,6 +324,12 @@ export const caseStudies: CaseStudy[] = [
       auditScreenshot: "/images/audits/caseStudy_2_audit.png",
       auditVideo: "/videos/caseStudy_2_video.mp4"
 
+    },
+
+    executiveSummary: {
+      challenge: "Custom video player trapped keyboard focus (no exit) and used inaccessible 'fake' captions.",
+      solution: "Implemented native range sliders for seeking, standard button controls, and WebVTT tracks.",
+      result: "Eliminated keyboard traps, enabled slider semantics for NVDA/JAWS, and standardized caption toggling."
     },
 
     overview:
@@ -527,6 +547,12 @@ stack: "HTML5 / SCSS / JavaScript",
     auditVideo: "/videos/caseStudy_3_video.mp4"
   },
 
+  executiveSummary: {
+      challenge: "Content tabs switched immediately on focus, confusing screen reader users and causing layout shifts.",
+      solution: "Built a robust ARIA tablist pattern with manual activation (Enter/Space to switch).",
+      result: "Restored predictable navigation flow and prevented cognitive overload from unexpected context changes."
+    },
+
   overview:
     "Streaming discovery surfaces often rely on visually styled tabs that lack semantic roles and predictable keyboard behavior. This case study focused on remediating a three-mode discovery switcher by implementing a proper tablist pattern with explicit relationships between tabs and panels, restoring expected arrow-key navigation and preventing unexpected context changes.",
 
@@ -642,6 +668,12 @@ stack: "HTML5 / SCSS / JavaScript",
     heroVideo: "/videos/caseStudy_4_video.mp4",
     auditVideo: "/videos/caseStudy_4_video.mp4"
   },
+
+  executiveSummary: {
+      challenge: "Persistent rail navigation lacked landmarks and disclosure states, forcing users to tab through 50+ links.",
+      solution: "Added nav landmarks, skip links, and semantic disclosure buttons for sub-genres.",
+      result: "Enabled instant bypass mechanisms and clear hierarchical navigation for assistive tech users."
+    },
 
   overview:
     "Streaming UIs frequently ship persistent left-rail navigation built with clickable divs, missing landmarks, and inaccessible expand/collapse groups. This case study remediated a genre rail by implementing a proper nav landmark, skip navigation, semantic lists, and disclosure controls with explicit expanded state ensuring full keyboard operation and WCAG 2.2 focus visibility requirements.",

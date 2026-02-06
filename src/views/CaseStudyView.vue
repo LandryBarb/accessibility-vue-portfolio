@@ -218,6 +218,28 @@ watch(() => route.params.id, () => {
 
       <main class="article-content">
 
+        <section class="summary-card" aria-label="Executive Summary">
+          <div class="summary-header">
+            <Lightbulb class="summary-icon" />
+            <h2 class="summary-title">Outcome Summary</h2>
+          </div>
+          
+          <dl class="summary-grid">
+            <div class="summary-item">
+              <dt>Challenge</dt>
+              <dd>{{ project.executiveSummary.challenge }}</dd>
+            </div>
+            <div class="summary-item">
+              <dt>Solution</dt>
+              <dd>{{ project.executiveSummary.solution }}</dd>
+            </div>
+            <div class="summary-item highlight">
+              <dt>Outcome</dt>
+              <dd>{{ project.executiveSummary.result }}</dd>
+            </div>
+          </dl>
+        </section>
+
         <section id="overview" class="section-block">
           <h2 class="section-heading">
             <Eye class="heading-icon" aria-hidden="true" />
@@ -226,20 +248,25 @@ watch(() => route.params.id, () => {
           <p class="text-body">{{ project.overview }}</p>
         </section>
 
-        <section id="gap" class="section-block">
+       <section id="gap" class="section-block">
           <h2 class="section-heading">
             <AlertTriangle class="heading-icon text-warning" aria-hidden="true" />
             The Accessibility Gap
           </h2>
           <div class="grid-barriers">
-            <div v-for="(barrier, index) in project.barriers" :key="index" class="card-barrier">
+            <div 
+              v-for="(barrier, index) in project.barriers" 
+              :key="index" 
+              class="card-barrier"
+              :class="`severity-${barrier.severity.toLowerCase()}`"
+            >
               <div class="barrier-header">
                 <h3 class="barrier-title">{{ barrier.title }}</h3>
                 <span class="wcag-badge">{{ barrier.wcag }}</span>
               </div>
               <p class="barrier-desc">{{ barrier.description }}</p>
               <div class="tag-row">
-                <span class="tag tag--error">Severity: {{ barrier.severity }}</span>
+                <span class="tag tag-severity">Severity: {{ barrier.severity }}</span>
               </div>
             </div>
           </div>
@@ -782,7 +809,63 @@ watch(() => route.params.id, () => {
   color: var(--text-secondary);
 }
 
-/* --- BARRIERS GRID --- */
+/* --- NEW: SUMMARY CARD STYLES --- */
+.summary-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 4px solid var(--brand-primary);
+  border-radius: 8px;
+  padding: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  color: var(--brand-primary);
+}
+
+.summary-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.summary-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.summary-item {
+  display: grid;
+  gap: 4px;
+  
+  dt {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    letter-spacing: 0.05em;
+  }
+  
+  dd {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+  }
+  
+  &.highlight dd {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+}
+
+/* --- BARRIERS GRID (UPDATED) --- */
 .grid-barriers {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -790,10 +873,41 @@ watch(() => route.params.id, () => {
 }
 
 .card-barrier {
-  background: rgba(239, 68, 68, 0.05);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  /* Default / Fallback */
+  --barrier-bg: rgba(255, 255, 255, 0.05);
+  --barrier-border: rgba(255, 255, 255, 0.1);
+  --barrier-fg: var(--text-tertiary);
+  
+  background: var(--barrier-bg);
+  border: 1px solid var(--barrier-border);
   padding: var(--space-md);
   border-radius: 8px;
+  transition: all 0.2s ease;
+
+  /* Severity Themes */
+  &.severity-critical {
+    --barrier-bg: rgba(239, 68, 68, 0.08); /* Red tint */
+    --barrier-border: rgba(239, 68, 68, 0.25);
+    --barrier-fg: #fca5a5; /* Light Red */
+  }
+
+  &.severity-high {
+    --barrier-bg: rgba(249, 115, 22, 0.08); /* Orange tint */
+    --barrier-border: rgba(249, 115, 22, 0.25);
+    --barrier-fg: #fdba74; /* Light Orange */
+  }
+
+  &.severity-medium {
+    --barrier-bg: rgba(251, 191, 36, 0.08); /* Amber tint */
+    --barrier-border: rgba(251, 191, 36, 0.25);
+    --barrier-fg: #fcd34d; /* Light Amber */
+  }
+
+  &.severity-low {
+    --barrier-bg: rgba(59, 130, 246, 0.08); /* Blue tint */
+    --barrier-border: rgba(59, 130, 246, 0.25);
+    --barrier-fg: #93c5fd; /* Light Blue */
+  }
 }
 
 .barrier-header {
@@ -806,7 +920,7 @@ watch(() => route.params.id, () => {
 }
 
 .barrier-title {
-  color: #fca5a5;
+  color: var(--barrier-fg); /* Inherit semantic color */
   font-weight: 700;
   font-size: var(--text-body);
 }
@@ -814,10 +928,11 @@ watch(() => route.params.id, () => {
 .wcag-badge {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  color: rgba(252, 165, 165, 0.8);
-  border: 1px solid rgba(252, 165, 165, 0.3);
+  color: var(--barrier-fg);
+  border: 1px solid var(--barrier-border);
   padding: 1px 4px;
   border-radius: 2px;
+  opacity: 0.9;
 }
 
 .barrier-desc {
@@ -826,13 +941,12 @@ watch(() => route.params.id, () => {
   margin-bottom: var(--space-sm);
 }
 
-.tag--error {
+.tag-severity {
   font-size: var(--text-xs);
   font-weight: 700;
   text-transform: uppercase;
-  color: #fca5a5;
+  color: var(--barrier-fg);
 }
-
 /* --- EVIDENCE MEDIA --- */
 .evidence-grid {
   display: grid;
